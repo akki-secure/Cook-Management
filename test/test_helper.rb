@@ -13,3 +13,11 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
   end
 end
+
+module SignInHelper
+  def sign_in_as(user, password: "password123")
+    post login_url, params: { email: user.email, password: password }
+  end
+end
+
+ActionDispatch::IntegrationTest.include SignInHelper

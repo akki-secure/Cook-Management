@@ -1,19 +1,17 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
 one:
-  title: MyString
-  description: MyText
-  instructions: MyText
-  cooking_time: 1
-  servings: 1
+  title: 肉じゃが
+  description: 定番の家庭料理です
+  instructions: 材料を切って煮込む
+  cooking_time: 30
+  servings: 4
   user: one
   category: one
 
 two:
-  title: MyString
-  description: MyText
-  instructions: MyText
-  cooking_time: 1
-  servings: 1
+  title: オムライス
+  description: ふわとろ卵のオムライス
+  instructions: チキンライスを作り卵で包む
+  cooking_time: 20
+  servings: 2
   user: two
   category: two
