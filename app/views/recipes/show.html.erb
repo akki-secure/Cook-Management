@@ -1,0 +1,53 @@
+<div class="recipe-header">
+  <% if @recipe.image.attached? %>
+    <%= image_tag @recipe.image %>
+  <% end %>
+
+  <h1><%= @recipe.title %></h1>
+
+  <div class="recipe-meta-list">
+    <span>カテゴリ: <%= @recipe.category.name %></span>
+    <% if @recipe.cooking_time.present? %>
+      <span>調理時間: <%= @recipe.cooking_time %>分</span>
+    <% end %>
+    <% if @recipe.servings.present? %>
+      <span><%= @recipe.servings %>人分</span>
+    <% end %>
+    <span>投稿者: <%= @recipe.user.name %></span>
+  </div>
+
+  <ul class="tag-list">
+    <% @recipe.tags.each do |tag| %>
+      <li><%= tag.name %></li>
+    <% end %>
+  </ul>
+</div>
+
+<% if @recipe.description.present? %>
+  <h2>説明</h2>
+  <p><%= simple_format(@recipe.description) %></p>
+<% end %>
+
+<h2>材料</h2>
+<% if @recipe.ingredients.any? %>
+  <ul>
+    <% @recipe.ingredients.each do |ingredient| %>
+      <li><%= ingredient.name %><% if ingredient.quantity.present? %> - <%= ingredient.quantity %><% end %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="empty-state">材料は登録されていません。</p>
+<% end %>
+
+<h2>作り方</h2>
+<p><%= simple_format(@recipe.instructions) %></p>
+
+<% if logged_in? && current_user == @recipe.user %>
+  <div class="actions-row">
+    <%= link_to "編集する", edit_recipe_path(@recipe), class: "btn" %>
+    <%= button_to "削除する", recipe_path(@recipe), method: :delete,
+          class: "btn btn-danger", form: { data: { turbo_confirm: "本当に削除しますか?" } } %>
+  </div>
+<% end %>
+
+<p><%= link_to "一覧に戻る", recipes_path %></p>

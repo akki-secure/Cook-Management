@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>レシピ管理</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <%= link_to "レシピ管理", root_path, class: "logo" %>
+        <nav>
+          <% if logged_in? %>
+            <%= link_to "新規レシピ", new_recipe_path %>
+            <span class="current-user"><%= current_user.name %>さん</span>
+            <%= button_to "ログアウト", logout_path, method: :delete, class: "link-button" %>
+          <% else %>
+            <%= link_to "ログイン", login_path %>
+            <%= link_to "新規登録", signup_path %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <% if notice %>
+        <p class="flash notice"><%= notice %></p>
+      <% end %>
+      <% if alert %>
+        <p class="flash alert"><%= alert %></p>
+      <% end %>
+
+      <%= yield %>
+    </main>
+  </body>
+</html>

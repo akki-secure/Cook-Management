@@ -1,0 +1,41 @@
+<h1>レシピ一覧</h1>
+
+<%= form_with url: recipes_path, method: :get, local: true, class: "filter-bar" do |f| %>
+  <%= f.text_field :q, value: params[:q], placeholder: "レシピ名・説明で検索" %>
+
+  <%= f.select :category_id,
+        options_for_select(@categories.map { |c| [ c.name, c.id ] }, params[:category_id]),
+        { include_blank: "すべてのカテゴリ" } %>
+
+  <%= f.select :tag_id,
+        options_for_select(@tags.map { |t| [ t.name, t.id ] }, params[:tag_id]),
+        { include_blank: "すべてのタグ" } %>
+
+  <%= f.submit "絞り込み", class: "btn" %>
+  <%= link_to "リセット", recipes_path %>
+<% end %>
+
+<% if @recipes.any? %>
+  <div class="recipe-grid">
+    <% @recipes.each do |recipe| %>
+      <%= link_to recipe, class: "recipe-card" do %>
+        <% if recipe.image.attached? %>
+          <%= image_tag recipe.image %>
+        <% else %>
+          <div class="no-image">No Image</div>
+        <% end %>
+        <div class="recipe-card-body">
+          <h3><%= recipe.title %></h3>
+          <div class="meta"><%= recipe.category.name %> / <%= recipe.user.name %></div>
+          <ul class="tag-list">
+            <% recipe.tags.each do |tag| %>
+              <li><%= tag.name %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <p class="empty-state">レシピが見つかりませんでした。</p>
+<% end %>

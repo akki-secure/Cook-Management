@@ -1,0 +1,7 @@
+<div class="ingredient-fields">
+  <%= form.hidden_field :id %>
+  <%= form.text_field :name, placeholder: "材料名(例: 玉ねぎ)" %>
+  <%= form.text_field :quantity, placeholder: "分量(例: 1個)" %>
+  <%= form.hidden_field :_destroy %>
+  <a href="#" class="fields-remove" data-action="nested-fields#remove">削除</a>
+</div>
