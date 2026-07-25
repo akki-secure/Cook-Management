@@ -1,0 +1,19 @@
+<h1>コメントを編集</h1>
+
+<%= form_with model: @comment, url: comment_path(@comment), class: "comment-form" do |f| %>
+  <% if @comment.errors.any? %>
+    <div class="error-messages">
+      <% @comment.errors.full_messages.each do |message| %>
+        <p><%= message %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :body, "コメント" %>
+    <%= f.text_area :body %>
+  </div>
+  <%= f.submit "更新する", class: "btn" %>
+<% end %>
+
+<p><%= link_to "レシピに戻る", @comment.recipe %></p>

@@ -1,0 +1,6 @@
+<%# locals: comment %>
+<div id="comment_form_errors" class="error-messages">
+  <% comment.errors.full_messages.each do |message| %>
+    <p><%= message %></p>
+  <% end %>
+</div>

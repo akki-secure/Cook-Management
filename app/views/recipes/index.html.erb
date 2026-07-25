@@ -18,22 +18,28 @@
 <% if @recipes.any? %>
   <div class="recipe-grid">
     <% @recipes.each do |recipe| %>
-      <%= link_to recipe, class: "recipe-card" do %>
-        <% if recipe.image.attached? %>
-          <%= image_tag recipe.image %>
-        <% else %>
-          <div class="no-image">No Image</div>
+      <div class="recipe-card-wrapper">
+        <%= link_to recipe, class: "recipe-card" do %>
+          <% if recipe.image.attached? %>
+            <%= image_tag recipe.image %>
+          <% else %>
+            <div class="no-image">No Image</div>
+          <% end %>
+          <div class="recipe-card-body">
+            <h3><%= recipe.title %></h3>
+            <div class="meta"><%= recipe.category.name %> / <%= recipe.user.name %></div>
+            <%= render "ratings/average_rating", recipe: recipe %>
+            <ul class="tag-list">
+              <% recipe.tags.each do |tag| %>
+                <li><%= tag.name %></li>
+              <% end %>
+            </ul>
+          </div>
         <% end %>
-        <div class="recipe-card-body">
-          <h3><%= recipe.title %></h3>
-          <div class="meta"><%= recipe.category.name %> / <%= recipe.user.name %></div>
-          <ul class="tag-list">
-            <% recipe.tags.each do |tag| %>
-              <li><%= tag.name %></li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
+        <% if logged_in? %>
+          <%= render "favorites/favorite_button", recipe: recipe %>
+        <% end %>
+      </div>
     <% end %>
   </div>
 <% else %>

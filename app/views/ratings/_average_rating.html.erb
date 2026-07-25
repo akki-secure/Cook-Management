@@ -1,0 +1,16 @@
+<%# locals: recipe %>
+<div id="average_rating_<%= recipe.id %>" class="average-rating">
+  <span class="stars" aria-label="評価 <%= recipe.average_rating || 0 %>">
+    <% full = (recipe.average_rating || 0).round %>
+    <% 5.times do |i| %>
+      <span class="star <%= "filled" if i < full %>"><%= i < full ? "&#9733;".html_safe : "&#9734;".html_safe %></span>
+    <% end %>
+  </span>
+  <span class="rating-count">
+    <% if recipe.rating_count.positive? %>
+      (<%= recipe.average_rating %> / <%= recipe.rating_count %>件)
+    <% else %>
+      (評価なし)
+    <% end %>
+  </span>
+</div>

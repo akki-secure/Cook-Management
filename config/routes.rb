@@ -9,7 +9,13 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
-  resources :recipes
+  resource :profile, only: [ :show, :edit, :update ], controller: "users"
+
+  resources :recipes do
+    resources :comments, only: [ :create, :edit, :update, :destroy ], shallow: true
+    resource :favorite, only: [ :create, :destroy ]
+  end
+  resources :ratings, only: [ :create ]
 
   root "recipes#index"
 end

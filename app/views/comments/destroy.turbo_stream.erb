@@ -1,0 +1,4 @@
+<%= turbo_stream.remove dom_id(@comment) %>
+<%= turbo_stream.replace "comments_count" do %>
+  <h2 id="comments_count">コメント (<%= @recipe.comments.count %>)</h2>
+<% end %>
