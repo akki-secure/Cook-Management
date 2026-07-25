@@ -1,0 +1,13 @@
+<%# locals: recipe %>
+<%= form_with url: ratings_path, method: :post, id: "rating_form_#{recipe.id}", class: "rating-form" do |f| %>
+  <%= hidden_field_tag :recipe_id, recipe.id %>
+  <div class="star-select">
+    <% my_score = current_user.ratings.find_by(recipe: recipe)&.score %>
+    <% (1..5).each do |i| %>
+      <label class="star-radio">
+        <%= radio_button_tag "rating[score]", i, my_score == i, onchange: "this.form.requestSubmit()" %>
+        <span class="star <%= "filled" if my_score && i <= my_score %>">&#9733;</span>
+      </label>
+    <% end %>
+  </div>
+<% end %>

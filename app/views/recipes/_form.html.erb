@@ -17,6 +17,7 @@
   <div class="form-group">
     <%= f.label :category_id, "カテゴリ" %>
     <%= f.collection_select :category_id, Category.order(:name), :id, :name, include_blank: "選択してください" %>
+    <%= text_field_tag "recipe[new_category_name]", nil, placeholder: "リストにない場合は新しいカテゴリ名を入力" %>
   </div>
 
   <div class="form-group">
@@ -46,7 +47,7 @@
 
   <div class="form-group">
     <%= f.label :image, "写真" %>
-    <% if recipe.image.attached? %>
+    <% if recipe.persisted? && recipe.image.attached? %>
       <div><%= image_tag recipe.image, style: "max-width: 200px; display: block; margin-bottom: 8px;" %></div>
     <% end %>
     <%= f.file_field :image, accept: "image/*" %>

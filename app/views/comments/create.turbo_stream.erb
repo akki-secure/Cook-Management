@@ -1,0 +1,12 @@
+<%= turbo_stream.prepend "comment_list" do %>
+  <%= render @comment %>
+<% end %>
+<%= turbo_stream.replace "comments_count" do %>
+  <h2 id="comments_count">コメント (<%= @recipe.comments.count %>)</h2>
+<% end %>
+<%= turbo_stream.replace "comment_form_errors" do %>
+  <div id="comment_form_errors"></div>
+<% end %>
+<%= turbo_stream.replace "comment_form" do %>
+  <%= render "comments/form", recipe: @recipe, comment: Comment.new %>
+<% end %>

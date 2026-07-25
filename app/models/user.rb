@@ -2,6 +2,9 @@ class User < ApplicationRecord
   has_secure_password
 
   has_many :recipes, dependent: :destroy
+  has_many :favorites, dependent: :destroy
+  has_many :comments, dependent: :destroy
+  has_many :ratings, dependent: :destroy
 
   normalizes :email, with: ->(email) { email.strip.downcase }
 

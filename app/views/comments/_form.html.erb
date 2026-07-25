@@ -1,0 +1,8 @@
+<%# locals: recipe, comment %>
+<%= form_with model: comment, url: recipe_comments_path(recipe), id: "comment_form", class: "comment-form" do |f| %>
+  <div class="form-group">
+    <%= f.label :body, "コメント" %>
+    <%= f.text_area :body %>
+  </div>
+  <%= f.submit "投稿する", class: "btn" %>
+<% end %>

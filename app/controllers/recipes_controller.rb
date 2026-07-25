@@ -4,7 +4,7 @@ class RecipesController < ApplicationController
   before_action :require_owner, only: [ :edit, :update, :destroy ]
 
   def index
-    @recipes = Recipe.includes(:category, :tags, :user)
+    @recipes = Recipe.includes(:category, :tags, :user, :ratings, :favorites)
                       .search_by_keyword(params[:q])
                       .in_category(params[:category_id])
                       .tagged_with(params[:tag_id])
@@ -25,6 +25,7 @@ class RecipesController < ApplicationController
   def create
     @recipe = current_user.recipes.build(recipe_params)
     assign_tags
+    assign_category
 
     if @recipe.save
       redirect_to @recipe, notice: "レシピを作成しました。"
@@ -40,6 +41,7 @@ class RecipesController < ApplicationController
 
   def update
     assign_tags
+    assign_category
 
     if @recipe.update(recipe_params)
       redirect_to @recipe, notice: "レシピを更新しました。"
@@ -76,5 +78,12 @@ class RecipesController < ApplicationController
   def assign_tags
     names = params[:recipe][:tag_names].to_s.split(",").map(&:strip).reject(&:blank?).uniq
     @recipe.tags = names.map { |name| Tag.find_or_create_by(name: name) }
+  end
+
+  def assign_category
+    new_name = params[:recipe][:new_category_name].to_s.strip
+    return if new_name.blank?
+
+    @recipe.category = Category.find_or_create_by(name: new_name)
   end
 end

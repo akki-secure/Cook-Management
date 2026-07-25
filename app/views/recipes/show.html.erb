@@ -23,6 +23,15 @@
   </ul>
 </div>
 
+<div class="recipe-engagement">
+  <%= render "favorites/favorite_button", recipe: @recipe %>
+  <%= render "ratings/average_rating", recipe: @recipe %>
+</div>
+
+<% if logged_in? %>
+  <%= render "ratings/rating_form", recipe: @recipe %>
+<% end %>
+
 <% if @recipe.description.present? %>
   <h2>説明</h2>
   <p><%= simple_format(@recipe.description) %></p>
@@ -41,6 +50,20 @@
 
 <h2>作り方</h2>
 <p><%= simple_format(@recipe.instructions) %></p>
+
+<section class="comments-section" id="comments">
+  <h2 id="comments_count">コメント (<%= @recipe.comments.count %>)</h2>
+  <div id="comment_list">
+    <%= render @recipe.comments.order(created_at: :desc) %>
+  </div>
+
+  <% if logged_in? %>
+    <div id="comment_form_errors"></div>
+    <%= render "comments/form", recipe: @recipe, comment: Comment.new %>
+  <% else %>
+    <p class="empty-state">コメントするには<%= link_to "ログイン", login_path %>してください。</p>
+  <% end %>
+</section>
 
 <% if logged_in? && current_user == @recipe.user %>
   <div class="actions-row">

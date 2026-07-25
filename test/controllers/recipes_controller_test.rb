@@ -91,6 +91,42 @@ class RecipesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "create uses a newly created category when new_category_name is given" do
+    sign_in_as(users(:one))
+
+    assert_difference "Category.count", 1 do
+      assert_difference "Recipe.count", 1 do
+        post recipes_url, params: { recipe: valid_params[:recipe].merge(new_category_name: "スイーツ") }
+      end
+    end
+
+    recipe = Recipe.order(:created_at).last
+    assert_equal "スイーツ", recipe.category.name
+  end
+
+  test "create reuses an existing category when new_category_name matches" do
+    sign_in_as(users(:one))
+    existing_name = categories(:two).name
+
+    assert_no_difference "Category.count" do
+      post recipes_url, params: { recipe: valid_params[:recipe].merge(new_category_name: existing_name) }
+    end
+
+    recipe = Recipe.order(:created_at).last
+    assert_equal categories(:two), recipe.category
+  end
+
+  test "create renders new without error when invalid and an image was attached" do
+    sign_in_as(users(:one))
+    image = fixture_file_upload("test_image.png", "image/png")
+
+    assert_no_difference "Recipe.count" do
+      post recipes_url, params: { recipe: valid_params[:recipe].merge(title: "", image: image) }
+    end
+
+    assert_response :unprocessable_entity
+  end
+
   test "edit redirects when not the owner" do
     sign_in_as(users(:two))
     get edit_recipe_url(recipes(:one))

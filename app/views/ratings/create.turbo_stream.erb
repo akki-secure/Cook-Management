@@ -1,0 +1,6 @@
+<%= turbo_stream.replace "average_rating_#{@recipe.id}" do %>
+  <%= render "ratings/average_rating", recipe: @recipe %>
+<% end %>
+<%= turbo_stream.replace "rating_form_#{@recipe.id}" do %>
+  <%= render "ratings/rating_form", recipe: @recipe %>
+<% end %>
