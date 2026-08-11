@@ -101,10 +101,12 @@ body {
   text-align: left;
   padding: 8px 10px;
   border-radius: 4px;
+  background: #c0392b;
+  color: #fff;
 }
 
 .user-menu-list .link-button:hover {
-  background: var(--bg);
+  background: #a53223;
 }
 
 main {
@@ -125,6 +127,10 @@ h2 { font-size: 1.3rem; }
 
 .form-group {
   margin-bottom: 16px;
+}
+
+.auth-form {
+  max-width: 360px;
 }
 
 .form-group label {
