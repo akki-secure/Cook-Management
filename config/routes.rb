@@ -11,6 +11,8 @@ Rails.application.routes.draw do
 
   resource :profile, only: [ :show, :edit, :update ], controller: "users"
 
+  resources :password_resets, param: :token, only: [ :new, :create, :edit, :update ]
+
   resources :recipes do
     resources :comments, only: [ :create, :edit, :update, :destroy ], shallow: true
     resource :favorite, only: [ :create, :destroy ]

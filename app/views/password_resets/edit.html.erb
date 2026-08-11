@@ -1,0 +1,31 @@
+<h1>新しいパスワードを設定</h1>
+
+<%= form_with model: @user, url: password_reset_path(params[:token]), method: :patch, local: true do |f| %>
+  <% if @user.errors.any? %>
+    <div class="error-messages">
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group" data-controller="password-visibility">
+    <%= f.label :password do %>新しいパスワード(8文字以上)<span class="required-mark">※</span><% end %>
+    <%= f.password_field :password, required: true, data: { password_visibility_target: "input" } %>
+    <button type="button" class="password-toggle" aria-pressed="false"
+            data-password-visibility-target="toggle"
+            data-action="password-visibility#toggle">表示</button>
+  </div>
+
+  <div class="form-group" data-controller="password-visibility">
+    <%= f.label :password_confirmation do %>パスワード(確認)<span class="required-mark">※</span><% end %>
+    <%= f.password_field :password_confirmation, required: true, data: { password_visibility_target: "input" } %>
+    <button type="button" class="password-toggle" aria-pressed="false"
+            data-password-visibility-target="toggle"
+            data-action="password-visibility#toggle">表示</button>
+  </div>
+
+  <%= f.submit "パスワードを再設定する", class: "btn" %>
+<% end %>
