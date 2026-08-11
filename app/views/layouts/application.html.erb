@@ -17,6 +17,7 @@
         <nav>
           <% if logged_in? %>
             <%= link_to "新規レシピ", new_recipe_path %>
+            <%= link_to "マイページ", profile_path %>
             <span class="current-user"><%= current_user.name %>さん</span>
             <%= button_to "ログアウト", logout_path, method: :delete, class: "link-button" %>
           <% else %>
