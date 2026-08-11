@@ -202,6 +202,16 @@ docker compose exec web bin/rails db:create db:migrate
 
 `http://localhost:3000` でアクセスできます。
 
+### デモアカウント
+
+新規登録なしですぐに動作確認したい場合は、以下のアカウントでログインできます。
+
+| ユーザー名 | メールアドレス | パスワード |
+| --- | --- | --- |
+| ウァッキー | genki@example.com | yoishou86! |
+| デモ太郎 | demo1@example.com | demoPass123! |
+| デモ花子 | demo2@example.com | demoPass456! |
+
 ### ローカル環境で動かす場合
 
 MySQLが起動していること(`config/database.yml`参照。`DB_HOST`/`DB_USERNAME`/`DB_PASSWORD` で接続先を変更可能)。
