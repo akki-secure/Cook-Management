@@ -14,6 +14,8 @@ servers:
 tags:
   - name: auth
     description: 新規登録・ログイン・ログアウト
+  - name: password_resets
+    description: パスワード再設定(メール経由)
   - name: profile
     description: マイページ
   - name: recipes
@@ -105,6 +107,12 @@ components:
       in: path
       required: true
       schema: { type: integer }
+    Token:
+      name: token
+      in: path
+      required: true
+      schema: { type: string }
+      description: "generates_token_for(:password_reset) が発行する署名付き有効期限付きトークン(30分)。パスワード変更で自動失効する"
 
 paths:
   /signup:
@@ -230,6 +238,69 @@ paths:
       responses:
         "200": { description: フォームHTML }
         "302": { description: 未ログイン。/login へリダイレクト }
+
+  /password_resets/new:
+    get:
+      tags: [password_resets]
+      summary: パスワード再設定申請フォーム表示
+      security: []
+      responses:
+        "200": { description: フォームHTML }
+
+  /password_resets:
+    post:
+      tags: [password_resets]
+      summary: パスワード再設定メールの送信
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        "302":
+          description: >
+            常に /login へリダイレクトし、同じ成功メッセージを表示する(ユーザー列挙対策のため、
+            メールアドレスが登録済みかどうかで挙動を変えない)。登録済みの場合のみ実際にメールが送信される。
+
+  /password_resets/{token}/edit:
+    get:
+      tags: [password_resets]
+      summary: 新パスワード設定フォーム表示
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Token"
+      responses:
+        "200": { description: フォームHTML }
+        "302": { description: トークンが無効・期限切れ(30分)。/password_resets/new へリダイレクト }
+
+  /password_resets/{token}:
+    patch:
+      tags: [password_resets]
+      summary: 新パスワードを設定
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Token"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  required: [password, password_confirmation]
+                  properties:
+                    password: { type: string, format: password, minLength: 8 }
+                    password_confirmation: { type: string, format: password }
+      responses:
+        "302": { description: 再設定成功。/login へリダイレクト }
+        "422": { description: パスワード不一致・8文字未満などのバリデーションエラー }
 
   /recipes:
     get:
