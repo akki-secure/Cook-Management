@@ -1,0 +1,22 @@
+<h1>マイページ</h1>
+
+<div class="profile-summary">
+  <p><strong>お名前:</strong> <%= current_user.name %></p>
+  <p><strong>メールアドレス:</strong> <%= current_user.email %></p>
+  <%= link_to "プロフィールを編集", edit_profile_path, class: "btn" %>
+</div>
+
+<h2>投稿したレシピ</h2>
+
+<% if @recipes.any? %>
+  <ul class="recipe-list">
+    <% @recipes.each do |recipe| %>
+      <li>
+        <%= link_to recipe.title, recipe_path(recipe) %>
+        <span class="recipe-meta"><%= recipe.category&.name %></span>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>まだレシピを投稿していません。</p>
+<% end %>

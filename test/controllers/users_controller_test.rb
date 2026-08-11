@@ -33,4 +33,51 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :unprocessable_entity
   end
+
+  test "show requires login" do
+    get profile_url
+    assert_redirected_to login_url
+  end
+
+  test "show displays the current user's recipes" do
+    sign_in_as(users(:one))
+    get profile_url
+    assert_response :success
+  end
+
+  test "edit requires login" do
+    get edit_profile_url
+    assert_redirected_to login_url
+  end
+
+  test "update changes name and email without touching password" do
+    sign_in_as(users(:one))
+    original_digest = users(:one).password_digest
+
+    patch profile_url, params: { user: { name: "新しい名前", email: "changed@example.com", password: "", password_confirmation: "" } }
+
+    assert_redirected_to profile_url
+    users(:one).reload
+    assert_equal "新しい名前", users(:one).name
+    assert_equal "changed@example.com", users(:one).email
+    assert_equal original_digest, users(:one).password_digest
+  end
+
+  test "update changes password when provided" do
+    sign_in_as(users(:one))
+
+    patch profile_url, params: { user: { name: users(:one).name, email: users(:one).email, password: "newpassword123", password_confirmation: "newpassword123" } }
+
+    assert_redirected_to profile_url
+    users(:one).reload
+    assert users(:one).authenticate("newpassword123")
+  end
+
+  test "update rejects invalid email" do
+    sign_in_as(users(:one))
+
+    patch profile_url, params: { user: { name: users(:one).name, email: "not-an-email", password: "", password_confirmation: "" } }
+
+    assert_response :unprocessable_entity
+  end
 end

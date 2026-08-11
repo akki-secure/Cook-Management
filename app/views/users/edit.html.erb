@@ -1,0 +1,37 @@
+<h1>プロフィール編集</h1>
+
+<%= form_with model: @user, url: profile_path, local: true do |f| %>
+  <% if @user.errors.any? %>
+    <div class="error-messages">
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :name, "お名前" %>
+    <%= f.text_field :name, required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :email, "メールアドレス" %>
+    <%= f.email_field :email, required: true %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :password, "新しいパスワード(変更する場合のみ、8文字以上)" %>
+    <%= f.password_field :password %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :password_confirmation, "新しいパスワード(確認)" %>
+    <%= f.password_field :password_confirmation %>
+  </div>
+
+  <%= f.submit "更新する", class: "btn" %>
+<% end %>
+
+<p><%= link_to "マイページに戻る", profile_path %></p>
