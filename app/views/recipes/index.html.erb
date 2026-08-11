@@ -42,6 +42,8 @@
       </div>
     <% end %>
   </div>
+
+  <%= paginate @recipes %>
 <% else %>
   <p class="empty-state">レシピが見つかりませんでした。</p>
 <% end %>

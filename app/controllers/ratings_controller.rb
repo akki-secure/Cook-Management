@@ -8,6 +8,7 @@ class RatingsController < ApplicationController
 
     respond_to do |format|
       if @rating.save
+        AppEventLogger.log(event: "rating.saved", user: current_user, recipe_id: @recipe.id, score: @rating.score)
         format.turbo_stream
         format.html { redirect_to @recipe, notice: "評価を登録しました。" }
       else

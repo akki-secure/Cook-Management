@@ -10,6 +10,7 @@ class RecipesController < ApplicationController
                       .tagged_with(params[:tag_id])
                       .order(created_at: :desc)
                       .distinct
+                      .page(params[:page]).per(20)
     @categories = Category.order(:name)
     @tags = Tag.order(:name)
   end
@@ -28,6 +29,7 @@ class RecipesController < ApplicationController
     assign_category
 
     if @recipe.save
+      AppEventLogger.log(event: "recipe.created", user: current_user, recipe_id: @recipe.id)
       redirect_to @recipe, notice: "レシピを作成しました。"
     else
       @recipe.ingredients.build if @recipe.ingredients.empty?
@@ -44,6 +46,7 @@ class RecipesController < ApplicationController
     assign_category
 
     if @recipe.update(recipe_params)
+      AppEventLogger.log(event: "recipe.updated", user: current_user, recipe_id: @recipe.id)
       redirect_to @recipe, notice: "レシピを更新しました。"
     else
       render :edit, status: :unprocessable_entity
@@ -51,7 +54,9 @@ class RecipesController < ApplicationController
   end
 
   def destroy
+    recipe_id = @recipe.id
     @recipe.destroy
+    AppEventLogger.log(event: "recipe.destroyed", user: current_user, recipe_id: recipe_id)
     redirect_to recipes_path, notice: "レシピを削除しました。"
   end
 

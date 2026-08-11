@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(bin/rails db:drop*)",
+      "Bash(bin/rails db:reset*)",
+      "Bash(bin/rails db:schema:load*)",
+      "Bash(bin/rails db:migrate:reset*)",
+      "Bash(bin/rails db:rollback*)",
+      "Bash(bin/rails db:migrate:redo*)",
+      "Bash(bin/rails db:test:prepare*)",
+      "Bash(rails db:drop*)",
+      "Bash(rails db:reset*)",
+      "Bash(rails db:schema:load*)",
+      "Bash(rails db:migrate:reset*)",
+      "Bash(rails db:rollback*)",
+      "Bash(rails db:migrate:redo*)",
+      "Bash(docker compose exec web bin/rails db:drop*)",
+      "Bash(docker compose exec web bin/rails db:reset*)",
+      "Bash(docker compose exec web bin/rails db:schema:load*)",
+      "Bash(docker compose exec web bin/rails db:migrate:reset*)",
+      "Bash(docker compose exec web bin/rails db:rollback*)",
+      "Bash(docker compose run web bin/rails db:drop*)",
+      "Bash(docker compose run web bin/rails db:reset*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push origin main --force*)",
+      "Bash(git push origin --force*)"
+    ]
+  }
+}
