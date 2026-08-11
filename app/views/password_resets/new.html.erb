@@ -1,0 +1,14 @@
+<h1>パスワード再設定</h1>
+
+<p>登録したメールアドレスを入力してください。パスワード再設定用のリンクをお送りします。</p>
+
+<%= form_with url: password_resets_path, method: :post, local: true do |f| %>
+  <div class="form-group">
+    <%= f.label :email, "メールアドレス" %>
+    <%= f.email_field :email, required: true %>
+  </div>
+
+  <%= f.submit "送信する", class: "btn" %>
+<% end %>
+
+<p><%= link_to "ログイン画面に戻る", login_path %></p>

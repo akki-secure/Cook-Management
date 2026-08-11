@@ -41,6 +41,13 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
+  # 開発環境ではletter_openerでメールをブラウザに自動表示する
+  config.action_mailer.delivery_method = :letter_opener
+  config.action_mailer.perform_deliveries = true
+
+  # TODO: 本番環境ではENV経由でSMTPを設定すること(認証情報はハードコードしない)
+  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
