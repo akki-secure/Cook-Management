@@ -1,0 +1,441 @@
+openapi: 3.0.3
+info:
+  title: レシピ管理アプリ エンドポイント仕様
+  description: >
+    セッションベースのRails HTMLアプリのエンドポイント仕様。JSON APIではないため、
+    レスポンスは基本的に302リダイレクト、HTMLレンダリング、または一部Turbo Stream。
+    リクエストパラメータとレスポンスの挙動を明文化する目的で作成している。
+  version: "1.0"
+
+servers:
+  - url: http://localhost:3000
+    description: ローカル開発環境
+
+tags:
+  - name: auth
+    description: 新規登録・ログイン・ログアウト
+  - name: profile
+    description: マイページ
+  - name: recipes
+    description: レシピのCRUD・検索
+  - name: comments
+    description: レシピへのコメント
+  - name: favorites
+    description: お気に入り登録・解除
+  - name: ratings
+    description: 星評価
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: _recipe_management_session
+      description: ログイン成功時にサーバーが発行するセッションCookie。以降のログイン必須エンドポイントで必要。
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string, format: email }
+    Recipe:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string, nullable: true }
+        instructions: { type: string, nullable: true }
+        cooking_time: { type: integer, nullable: true, description: "分" }
+        servings: { type: integer, nullable: true }
+        user_id: { type: integer }
+        category_id: { type: integer }
+    Ingredient:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        quantity: { type: string, nullable: true }
+    Comment:
+      type: object
+      properties:
+        id: { type: integer }
+        body: { type: string }
+        user_id: { type: integer }
+        recipe_id: { type: integer }
+    ValidationError:
+      type: object
+      properties:
+        errors:
+          type: array
+          items: { type: string }
+          description: "@user.errors.full_messages 等、日本語のバリデーションメッセージ"
+    RecipeInput:
+      type: object
+      properties:
+        recipe:
+          type: object
+          properties:
+            title: { type: string }
+            description: { type: string }
+            instructions: { type: string }
+            cooking_time: { type: integer }
+            servings: { type: integer }
+            category_id: { type: integer, description: "既存カテゴリを選ぶ場合" }
+            new_category_name: { type: string, description: "新規カテゴリ名(指定時はcategory_idより優先)" }
+            tag_names: { type: string, description: "カンマ区切りのタグ名。未存在のタグは自動作成" }
+            image: { type: string, format: binary }
+            ingredients_attributes:
+              type: array
+              items:
+                type: object
+                properties:
+                  name: { type: string }
+                  quantity: { type: string }
+
+  parameters:
+    RecipeId:
+      name: recipe_id
+      in: path
+      required: true
+      schema: { type: integer }
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer }
+
+paths:
+  /signup:
+    get:
+      tags: [auth]
+      summary: 新規登録フォーム表示
+      security: []
+      responses:
+        "200": { description: フォームHTML }
+    post:
+      tags: [auth]
+      summary: ユーザー登録
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  required: [name, email, password, password_confirmation]
+                  properties:
+                    name: { type: string }
+                    email: { type: string, format: email }
+                    password: { type: string, format: password, minLength: 8 }
+                    password_confirmation: { type: string, format: password }
+      responses:
+        "302":
+          description: 登録成功。セッション作成の上 /recipes へリダイレクト
+        "422":
+          description: バリデーションエラー。フォームを再表示
+          content:
+            text/html:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+
+  /login:
+    get:
+      tags: [auth]
+      summary: ログインフォーム表示
+      security: []
+      responses:
+        "200": { description: フォームHTML }
+    post:
+      tags: [auth]
+      summary: ログイン
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+      responses:
+        "302":
+          description: 認証成功。セッション作成の上 /recipes へリダイレクト
+        "422":
+          description: メールアドレスまたはパスワードが不正
+
+  /logout:
+    delete:
+      tags: [auth]
+      summary: ログアウト
+      security: [{ sessionCookie: [] }]
+      responses:
+        "302":
+          description: セッション破棄の上 /login へリダイレクト
+
+  /profile:
+    get:
+      tags: [profile]
+      summary: マイページ表示(自分の投稿レシピ一覧を含む)
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200":
+          description: マイページHTML(投稿したレシピ一覧を含む)
+          content:
+            text/html:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: "#/components/schemas/User" }
+                  recipes:
+                    type: array
+                    items: { $ref: "#/components/schemas/Recipe" }
+        "302":
+          description: 未ログイン。/login へリダイレクト
+    patch:
+      tags: [profile]
+      summary: プロフィール更新(名前・メール・パスワード)
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    email: { type: string, format: email }
+                    password:
+                      type: string
+                      format: password
+                      description: 空文字の場合パスワードは変更されない
+                    password_confirmation: { type: string, format: password }
+      responses:
+        "302": { description: 更新成功。/profile へリダイレクト }
+        "422": { description: バリデーションエラー。編集フォームを再表示 }
+
+  /profile/edit:
+    get:
+      tags: [profile]
+      summary: プロフィール編集フォーム表示
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: フォームHTML }
+        "302": { description: 未ログイン。/login へリダイレクト }
+
+  /recipes:
+    get:
+      tags: [recipes]
+      summary: レシピ一覧・検索・絞り込み
+      security: []
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+          description: タイトル・説明のキーワード検索
+        - name: category_id
+          in: query
+          schema: { type: integer }
+        - name: tag_id
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: レシピ一覧HTML
+          content:
+            text/html: {}
+    post:
+      tags: [recipes]
+      summary: レシピ作成
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RecipeInput"
+      responses:
+        "302": { description: 作成成功。/recipes/:id へリダイレクト }
+        "422": { description: バリデーションエラー }
+
+  /recipes/new:
+    get:
+      tags: [recipes]
+      summary: レシピ作成フォーム表示
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: フォームHTML }
+
+  /recipes/{id}:
+    get:
+      tags: [recipes]
+      summary: レシピ詳細表示
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: レシピ詳細HTML(材料・コメント・平均評価を含む)
+          content:
+            text/html:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Recipe"
+                  - type: object
+                    properties:
+                      ingredients:
+                        type: array
+                        items: { $ref: "#/components/schemas/Ingredient" }
+                      comments:
+                        type: array
+                        items: { $ref: "#/components/schemas/Comment" }
+    patch:
+      tags: [recipes]
+      summary: レシピ更新(投稿者本人のみ)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/RecipeInput"
+      responses:
+        "302": { description: 更新成功。/recipes/:id へリダイレクト }
+        "422": { description: バリデーションエラー }
+    delete:
+      tags: [recipes]
+      summary: レシピ削除(投稿者本人のみ)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "302": { description: 削除成功。/recipes へリダイレクト }
+
+  /recipes/{id}/edit:
+    get:
+      tags: [recipes]
+      summary: レシピ編集フォーム表示(投稿者本人のみ)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200": { description: フォームHTML }
+        "302": { description: 投稿者以外。/recipes へリダイレクト }
+
+  /recipes/{recipe_id}/comments:
+    post:
+      tags: [comments]
+      summary: コメント投稿
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/RecipeId"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: object
+                  required: [body]
+                  properties:
+                    body: { type: string }
+      responses:
+        "200":
+          description: turbo_stream形式の場合、コメント一覧を差分更新
+        "302": { description: HTML形式の場合、/recipes/:id へリダイレクト }
+
+  /comments/{id}/edit:
+    get:
+      tags: [comments]
+      summary: コメント編集フォーム表示(投稿者本人のみ)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200": { description: フォームHTML }
+
+  /comments/{id}:
+    patch:
+      tags: [comments]
+      summary: コメント更新(投稿者本人のみ)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: object
+                  properties:
+                    body: { type: string }
+      responses:
+        "200": { description: turbo_stream差分更新 }
+        "422": { description: バリデーションエラー }
+    delete:
+      tags: [comments]
+      summary: コメント削除(投稿者本人のみ)
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200": { description: turbo_stream差分更新 }
+        "302": { description: HTML形式の場合、/recipes/:id へリダイレクト }
+
+  /recipes/{recipe_id}/favorite:
+    post:
+      tags: [favorites]
+      summary: お気に入り登録
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/RecipeId"
+      responses:
+        "200": { description: turbo_streamでハートボタンを差分更新 }
+        "302": { description: HTML形式の場合、元のページへリダイレクト }
+    delete:
+      tags: [favorites]
+      summary: お気に入り解除
+      security: [{ sessionCookie: [] }]
+      parameters:
+        - $ref: "#/components/parameters/RecipeId"
+      responses:
+        "200": { description: turbo_streamでハートボタンを差分更新 }
+        "302": { description: HTML形式の場合、元のページへリダイレクト }
+
+  /ratings:
+    post:
+      tags: [ratings]
+      summary: レシピを評価(1〜5点、同一ユーザー・レシピの組では上書き)
+      security: [{ sessionCookie: [] }]
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [recipe_id, rating]
+              properties:
+                recipe_id: { type: integer }
+                rating:
+                  type: object
+                  required: [score]
+                  properties:
+                    score: { type: integer, minimum: 1, maximum: 5 }
+      responses:
+        "200": { description: turbo_streamで平均評価を差分更新 }
+        "302": { description: HTML形式の場合、/recipes/:id へリダイレクト }
