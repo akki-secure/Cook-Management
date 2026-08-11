@@ -18,8 +18,12 @@
           <% if logged_in? %>
             <%= link_to "新規レシピ", new_recipe_path %>
             <%= link_to "マイページ", profile_path %>
-            <span class="current-user"><%= current_user.name %>さん</span>
-            <%= button_to "ログアウト", logout_path, method: :delete, class: "link-button" %>
+            <details class="user-menu" data-controller="dropdown" data-dropdown-target="menu">
+              <summary class="current-user user-menu-trigger"><%= current_user.name %>さん</summary>
+              <div class="user-menu-list">
+                <%= button_to "ログアウト", logout_path, method: :delete, class: "link-button" %>
+              </div>
+            </details>
           <% else %>
             <%= link_to "ログイン", login_path %>
             <%= link_to "新規登録", signup_path %>

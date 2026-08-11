@@ -68,6 +68,45 @@ body {
   color: var(--muted);
 }
 
+.user-menu {
+  position: relative;
+}
+
+.user-menu-trigger {
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.user-menu-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.user-menu-list {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  min-width: 120px;
+  padding: 4px;
+  z-index: 10;
+}
+
+.user-menu-list .link-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 4px;
+}
+
+.user-menu-list .link-button:hover {
+  background: var(--bg);
+}
+
 main {
   padding: 24px 16px 64px;
 }
