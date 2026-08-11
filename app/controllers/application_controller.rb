@@ -16,4 +16,10 @@ class ApplicationController < ActionController::Base
 
     redirect_to login_path, alert: "ログインしてください。"
   end
+
+  def append_info_to_payload(payload)
+    super
+    payload[:request_id] = request.request_id
+    payload[:user_id] = current_user&.id
+  end
 end

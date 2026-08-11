@@ -10,6 +10,7 @@ class CommentsController < ApplicationController
 
     respond_to do |format|
       if @comment.save
+        AppEventLogger.log(event: "comment.created", user: current_user, recipe_id: @recipe.id, comment_id: @comment.id)
         format.turbo_stream
         format.html { redirect_to @recipe, notice: "コメントを投稿しました。" }
       else
@@ -27,6 +28,7 @@ class CommentsController < ApplicationController
 
   def update
     if @comment.update(comment_params)
+      AppEventLogger.log(event: "comment.updated", user: current_user, comment_id: @comment.id)
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to @comment.recipe, notice: "コメントを更新しました。" }
@@ -38,7 +40,9 @@ class CommentsController < ApplicationController
 
   def destroy
     @recipe = @comment.recipe
+    comment_id = @comment.id
     @comment.destroy
+    AppEventLogger.log(event: "comment.destroyed", user: current_user, comment_id: comment_id, recipe_id: @recipe.id)
 
     respond_to do |format|
       format.turbo_stream
