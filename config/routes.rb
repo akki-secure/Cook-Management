@@ -19,5 +19,13 @@ Rails.application.routes.draw do
   end
   resources :ratings, only: [ :create ]
 
+  namespace :api do
+    namespace :v1 do
+      post "auth", to: "sessions#create"
+      resource :status, only: [ :show ], controller: "status"
+      resources :monsters, only: [ :index ]
+    end
+  end
+
   root "recipes#index"
 end
