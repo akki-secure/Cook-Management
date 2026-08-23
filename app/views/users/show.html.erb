@@ -6,6 +6,29 @@
   <%= link_to "プロフィールを編集", edit_profile_path, class: "btn" %>
 </div>
 
+<div class="gamification-summary">
+  <h2>料理人ステータス</h2>
+  <p><strong>称号:</strong> <%= current_user.current_title&.name || "称号なし" %></p>
+  <p><strong>レベル:</strong> <%= current_user.level %> / 100</p>
+  <% next_exp = Gamification::LevelCalculator.next_level_total_exp(current_user.exp) %>
+  <p>
+    <strong>EXP:</strong> <%= current_user.exp %>
+    <%= next_exp ? "(次のレベルまで #{next_exp - current_user.exp})" : "(最大レベルに到達しています)" %>
+  </p>
+  <p><strong>連続記録日数:</strong> <%= current_user.current_streak_days %>日（最長 <%= current_user.longest_streak_days %>日）</p>
+
+  <h3>獲得モンスター (<%= current_user.monsters.count %>体)</h3>
+  <% if current_user.monsters.any? %>
+    <ul class="monster-list">
+      <% current_user.monsters.order(:unlock_min_level).each do |monster| %>
+        <li><%= monster.name %></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>まだモンスターを獲得していません。写真付きでレシピを投稿してみましょう。</p>
+  <% end %>
+</div>
+
 <h2>投稿したレシピ</h2>
 
 <% if @recipes.any? %>
