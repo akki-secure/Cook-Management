@@ -7,6 +7,7 @@ class SessionsController < ApplicationController
 
     if user&.authenticate(params[:password])
       session[:user_id] = user.id
+      Gamification::StreakService.new(user).record_login!
       redirect_to recipes_path, notice: "ログインしました。"
     else
       flash.now[:alert] = "メールアドレスまたはパスワードが違います。"

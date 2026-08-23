@@ -28,6 +28,7 @@ class RecipesController < ApplicationController
     assign_category
 
     if @recipe.save
+      Gamification::RecipePostExpService.call(user: current_user, recipe: @recipe) if @recipe.image.attached?
       redirect_to @recipe, notice: "レシピを作成しました。"
     else
       @recipe.ingredients.build if @recipe.ingredients.empty?

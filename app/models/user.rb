@@ -10,6 +10,12 @@ class User < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :comments, dependent: :destroy
   has_many :ratings, dependent: :destroy
+  has_many :exp_events, dependent: :destroy
+  has_many :user_monsters, dependent: :destroy
+  has_many :monsters, through: :user_monsters
+  has_many :user_titles, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
+  belongs_to :current_title, class_name: "Title", optional: true
 
   normalizes :email, with: ->(email) { email.strip.downcase }
 
