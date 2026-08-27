@@ -1,0 +1,7 @@
+# Godotエディタが自動生成するキャッシュ・インポートデータ(環境依存なのでコミットしない)
+.godot/
+*.translation
+export_presets.cfg
+
+# .import/ was Godot 3; kept for safety if migrating an older project
+.import/
