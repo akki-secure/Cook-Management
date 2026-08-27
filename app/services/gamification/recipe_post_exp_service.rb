@@ -16,7 +16,10 @@ module Gamification
         source_id: recipe.id, occurred_on: recipe.created_at.to_date
       )
       StreakService.new(user).record_activity!(on: recipe.created_at.to_date)
-      MonthlyTitleService.call(user: user, recipe: recipe)
+      CoinGrantService.call(
+        user: user, source_type: CoinEvent::RECIPE_POST, amount: CoinRules::RECIPE_POST_COINS,
+        source_id: recipe.id, occurred_on: recipe.created_at.to_date
+      )
     end
 
     private
