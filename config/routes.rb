@@ -19,6 +19,8 @@ Rails.application.routes.draw do
   end
   resources :ratings, only: [ :create ]
 
+  post "gacha", to: "gacha#create"
+
   namespace :api do
     namespace :v1 do
       post "auth", to: "sessions#create"

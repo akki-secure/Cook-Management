@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_23_092430) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_27_121004) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -56,6 +56,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_23_092430) do
     t.index ["name"], name: "index_categories_on_name", unique: true
   end
 
+  create_table "coin_events", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "source_type", null: false
+    t.bigint "source_id"
+    t.integer "amount", null: false
+    t.date "occurred_on", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "occurred_on"], name: "index_coin_events_on_user_id_and_occurred_on"
+    t.index ["user_id", "source_type", "source_id"], name: "index_coin_events_on_user_and_source", unique: true
+    t.index ["user_id"], name: "index_coin_events_on_user_id"
+  end
+
   create_table "comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "recipe_id", null: false
@@ -88,6 +101,17 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_23_092430) do
     t.index ["recipe_id"], name: "index_favorites_on_recipe_id"
     t.index ["user_id", "recipe_id"], name: "index_favorites_on_user_id_and_recipe_id", unique: true
     t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
+  create_table "gacha_pulls", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "monster_id"
+    t.integer "cost", null: false
+    t.boolean "hit", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["monster_id"], name: "index_gacha_pulls_on_monster_id"
+    t.index ["user_id"], name: "index_gacha_pulls_on_user_id"
   end
 
   create_table "ingredients", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -165,11 +189,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_23_092430) do
     t.bigint "user_id", null: false
     t.bigint "monster_id", null: false
     t.date "acquired_on", null: false
-    t.string "acquired_year_month", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["monster_id"], name: "index_user_monsters_on_monster_id"
-    t.index ["user_id", "acquired_year_month"], name: "index_user_monsters_on_user_id_and_acquired_year_month", unique: true
     t.index ["user_id"], name: "index_user_monsters_on_user_id"
   end
 
@@ -195,6 +217,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_23_092430) do
     t.integer "longest_streak_days", default: 0, null: false
     t.date "last_activity_on"
     t.bigint "current_title_id"
+    t.integer "coins", default: 0, null: false
     t.index ["current_title_id"], name: "index_users_on_current_title_id"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
@@ -202,11 +225,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_23_092430) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "coin_events", "users"
   add_foreign_key "comments", "recipes"
   add_foreign_key "comments", "users"
   add_foreign_key "exp_events", "users"
   add_foreign_key "favorites", "recipes"
   add_foreign_key "favorites", "users"
+  add_foreign_key "gacha_pulls", "monsters"
+  add_foreign_key "gacha_pulls", "users"
   add_foreign_key "ingredients", "recipes"
   add_foreign_key "ratings", "recipes"
   add_foreign_key "ratings", "users"

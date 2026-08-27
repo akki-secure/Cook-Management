@@ -11,6 +11,8 @@ class User < ApplicationRecord
   has_many :comments, dependent: :destroy
   has_many :ratings, dependent: :destroy
   has_many :exp_events, dependent: :destroy
+  has_many :coin_events, dependent: :destroy
+  has_many :gacha_pulls, dependent: :destroy
   has_many :user_monsters, dependent: :destroy
   has_many :monsters, through: :user_monsters
   has_many :user_titles, dependent: :destroy

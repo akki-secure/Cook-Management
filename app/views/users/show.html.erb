@@ -16,6 +16,10 @@
     <%= next_exp ? "(次のレベルまで #{next_exp - current_user.exp})" : "(最大レベルに到達しています)" %>
   </p>
   <p><strong>連続記録日数:</strong> <%= current_user.current_streak_days %>日（最長 <%= current_user.longest_streak_days %>日）</p>
+  <p><strong>所持コイン:</strong> <%= current_user.coins %>枚</p>
+
+  <%= button_to "ガチャを回す(消費#{Gamification::GachaRules::COST}コイン)", gacha_path, method: :post, class: "btn",
+        disabled: current_user.coins < Gamification::GachaRules::COST %>
 
   <h3>獲得モンスター (<%= current_user.monsters.count %>体)</h3>
   <% if current_user.monsters.any? %>

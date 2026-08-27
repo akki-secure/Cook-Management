@@ -48,6 +48,11 @@ layout_mode = 2
 text = "連続記録: 0日（最長 0日）"
 horizontal_alignment = 1
 
+[node name="CoinLabel" type="Label" parent="VBox"]
+layout_mode = 2
+text = "所持コイン: 0枚"
+horizontal_alignment = 1
+
 [node name="MonsterScroll" type="ScrollContainer" parent="VBox"]
 layout_mode = 2
 size_flags_vertical = 3

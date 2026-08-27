@@ -5,6 +5,7 @@ extends Control
 @onready var exp_bar: ProgressBar = $VBox/ExpBar
 @onready var exp_label: Label = $VBox/ExpLabel
 @onready var streak_label: Label = $VBox/StreakLabel
+@onready var coin_label: Label = $VBox/CoinLabel
 @onready var monster_grid: GridContainer = $VBox/MonsterScroll/MonsterGrid
 @onready var status_request: HTTPRequest = $StatusRequest
 @onready var monsters_request: HTTPRequest = $MonstersRequest
@@ -48,6 +49,7 @@ func _on_status_completed(_result: int, response_code: int, _headers: PackedStri
 		exp_label.text = "%d EXP (最大レベル)" % exp
 
 	streak_label.text = "連続記録: %d日（最長 %d日）" % [data["current_streak_days"], data["longest_streak_days"]]
+	coin_label.text = "所持コイン: %d枚" % data.get("coins", 0)
 
 func _on_monsters_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	if response_code != 200:
