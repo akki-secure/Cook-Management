@@ -26,6 +26,7 @@ Rails.application.routes.draw do
       post "auth", to: "sessions#create"
       resource :status, only: [ :show ], controller: "status"
       resources :monsters, only: [ :index ]
+      post "gacha", to: "gacha#create"
     end
   end
 
