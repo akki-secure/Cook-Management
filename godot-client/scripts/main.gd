@@ -6,6 +6,7 @@ extends Control
 @onready var exp_label: Label = $VBox/ExpLabel
 @onready var streak_label: Label = $VBox/StreakLabel
 @onready var coin_label: Label = $VBox/CoinLabel
+@onready var gacha_button: Button = $VBox/GachaButton
 @onready var monster_grid: GridContainer = $VBox/MonsterScroll/MonsterGrid
 @onready var status_request: HTTPRequest = $StatusRequest
 @onready var monsters_request: HTTPRequest = $MonstersRequest
@@ -16,8 +17,12 @@ const MonsterItemScene := preload("res://scenes/MonsterItem.tscn")
 func _ready() -> void:
 	status_request.request_completed.connect(_on_status_completed)
 	monsters_request.request_completed.connect(_on_monsters_completed)
+	gacha_button.pressed.connect(_on_gacha_button_pressed)
 	poll_timer.timeout.connect(refresh)
 	refresh()
+
+func _on_gacha_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/GachaScene.tscn")
 
 ## 起動時と、Timer(30秒間隔)のたびに現在のレベル/EXP/モンスターを取得し直す。
 ## リアルタイム通知ではなく、ポーリングで十分という設計方針(WebSocketは将来拡張)。
