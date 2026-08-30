@@ -26,6 +26,10 @@ tags:
     description: お気に入り登録・解除
   - name: ratings
     description: 星評価
+  - name: gacha
+    description: 料理コインを消費してガチャを回す(セッションベース、マイページ用)
+  - name: api_v1
+    description: Godotクライアント向けJSON API(トークン認証)
 
 components:
   securitySchemes:
@@ -34,6 +38,12 @@ components:
       in: cookie
       name: _recipe_management_session
       description: ログイン成功時にサーバーが発行するセッションCookie。以降のログイン必須エンドポイントで必要。
+    apiToken:
+      type: http
+      scheme: bearer
+      description: >
+        POST /api/v1/auth で発行される、Godotクライアント向けのAPIトークン。
+        以降の /api/v1/* エンドポイントには `Authorization: Bearer <token>` ヘッダーが必要。
 
   schemas:
     User:
@@ -95,6 +105,49 @@ components:
                 properties:
                   name: { type: string }
                   quantity: { type: string }
+    GachaResult:
+      type: object
+      properties:
+        hit: { type: boolean, description: "当たったかどうか" }
+        monster:
+          type: object
+          nullable: true
+          description: "当たった場合のみ値が入る。ハズレの場合はnull"
+          properties:
+            name: { type: string }
+            sprite_key: { type: string, description: "Godot側の表示キー、例: color:red;shape:circle" }
+        coins: { type: integer, description: "ガチャ実行後の所持コイン数" }
+    GachaError:
+      type: object
+      properties:
+        error: { type: string, enum: [insufficient_coins], description: "コイン不足時に返る" }
+    ApiAuthResponse:
+      type: object
+      properties:
+        token: { type: string, description: "以降のリクエストで Authorization: Bearer <token> として使うAPIトークン" }
+        user:
+          type: object
+          properties:
+            id: { type: integer }
+            name: { type: string }
+    StatusResponse:
+      type: object
+      properties:
+        level: { type: integer, minimum: 1, maximum: 100 }
+        exp: { type: integer }
+        next_level_exp: { type: integer, nullable: true, description: "次のレベルに必要な累積EXP。最大レベルの場合はnull" }
+        current_title: { type: string, nullable: true }
+        current_streak_days: { type: integer }
+        longest_streak_days: { type: integer }
+        coins: { type: integer }
+    MonsterResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        sprite_key: { type: string }
+        description: { type: string, nullable: true }
+        acquired_on: { type: string, format: date }
 
   parameters:
     RecipeId:
@@ -510,3 +563,88 @@ paths:
       responses:
         "200": { description: turbo_streamで平均評価を差分更新 }
         "302": { description: HTML形式の場合、/recipes/:id へリダイレクト }
+
+  /gacha:
+    post:
+      tags: [gacha]
+      summary: ガチャを1回実行する(所持コインを消費、マイページ用)
+      security: [{ sessionCookie: [] }]
+      responses:
+        "302":
+          description: >
+            /profile へリダイレクト。当たり・ハズレ・コイン不足のいずれもflashメッセージで通知し、
+            レスポンス自体はリダイレクトのみ(JSONではない)。ガチャの抽選ロジックはGamification::GachaPullServiceに集約されており、
+            /api/v1/gacha と共通。
+
+  /api/v1/auth:
+    post:
+      tags: [api_v1]
+      summary: Godotクライアント用のログイン、APIトークンを発行する
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password }
+      responses:
+        "201":
+          description: 認証成功。以降のリクエストで使うAPIトークンを発行
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiAuthResponse" }
+        "401":
+          description: メールアドレスまたはパスワードが不正
+
+  /api/v1/status:
+    get:
+      tags: [api_v1]
+      summary: 現在のレベル/EXP/称号/連続記録日数/所持コインを取得する
+      security: [{ apiToken: [] }]
+      responses:
+        "200":
+          description: ステータス情報
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StatusResponse" }
+        "401":
+          description: トークンが未指定または無効
+
+  /api/v1/monsters:
+    get:
+      tags: [api_v1]
+      summary: 獲得済みモンスターの一覧を取得する
+      security: [{ apiToken: [] }]
+      responses:
+        "200":
+          description: 獲得日時の昇順で並んだモンスター一覧(重複所持もそのまま件数分返る)
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/MonsterResponse" }
+        "401":
+          description: トークンが未指定または無効
+
+  /api/v1/gacha:
+    post:
+      tags: [api_v1]
+      summary: ガチャを1回実行する(所持コインを消費、Godotクライアント用)
+      security: [{ apiToken: [] }]
+      responses:
+        "201":
+          description: 抽選結果(当たり・ハズレ問わず返る)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GachaResult" }
+        "401":
+          description: トークンが未指定または無効
+        "422":
+          description: 所持コインが消費コスト未満
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GachaError" }

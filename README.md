@@ -2,6 +2,10 @@
 
 自分の作ったレシピを登録・共有できるレシピ管理アプリです。カテゴリやタグでの検索、お気に入り登録、コメント、5段階の星評価に対応しています。
 
+## 目的
+
+料理を続けて記録するのは、モチベーションの維持が難しく挫折しやすいという課題があります。本アプリはゲーミフィケーション要素(EXP・レベル・称号・ガチャ)を取り入れることで、レシピ投稿を継続する楽しさを演出し、日々の料理をより前向きに続けられることを目指しています。
+
 ## 主な機能
 
 - **レシピのCRUD**: タイトル・説明・材料(複数追加/削除可)・作り方・調理時間・人数分・写真を登録
@@ -11,6 +15,9 @@
 - **コメント**: レシピへのコメント投稿・編集・削除(自分のコメントのみ編集・削除可)
 - **評価(★5段階)**: レシピを1〜5の星で評価。1人1レシピにつき1件、後から変更可。平均評価を一覧・詳細に表示
 - **ユーザー認証**: メールアドレス・パスワードでの新規登録/ログイン(セッションベース、Devise等は未使用)
+- **ゲーミフィケーション**: 写真付きレシピの新規投稿でEXP・料理コインを獲得。EXPでレベル(1〜100)が上がり、レベルに応じて称号が変化。ログイン・投稿による連続記録(ストリーク)ボーナスもあり
+- **ガチャ**: 料理コインを消費してガチャを回し、当たれば料理モンスターを1体獲得(ハズレもある)。マイページから、または後述のGodotクライアントから実行可能
+- **Godotクライアント連携**: `godot-client/`に同梱のGodot 4製デスクトップアプリから、レベル・EXP・称号・所持コイン・獲得モンスターの確認とガチャの実行ができる(`/api/v1`のトークン認証付きJSON APIで通信)
 
 ## 技術スタック
 
@@ -18,7 +25,9 @@
 - MySQL 8.0
 - Turbo / Stimulus(importmap、JSビルド不要)
 - Active Storage(画像アップロード)
+- Jbuilder(`/api/v1`のJSONレスポンス生成)
 - Minitest(テスト)
+- Godot 4.7(`godot-client/`、GDScript製の連携クライアント。任意)
 
 ## 画面遷移図
 
@@ -39,17 +48,20 @@ flowchart TD
     Index -->|詳細を見る| Show["レシピ詳細\n/recipes/:id\n(♥お気に入り・コメント・★評価)"]
 
     Index -->|ログイン済み| New["レシピ作成\n/recipes/new"]
-    New -->|保存| Show
+    New -->|保存、写真付きならEXP・コイン付与| Show
     Show -->|投稿者本人のみ| Edit["レシピ編集\n/recipes/:id/edit"]
     Edit -->|更新| Show
 
-    Index -->|ログイン済み| Profile["マイページ\n/profile\n(投稿レシピ一覧)"]
+    Index -->|ログイン済み| Profile["マイページ\n/profile\n投稿レシピ一覧・レベル/EXP/称号/コイン/獲得モンスター\nガチャを回すボタン(POST /gacha)あり"]
     Profile --> ProfileEdit["プロフィール編集\n/profile/edit"]
     ProfileEdit -->|名前・メール・パスワード更新| Profile
     Profile -->|ログアウト| Login
+
+    Godot["Godotクライアント\n(godot-client/、任意)"] -.->|POST /api/v1/auth| Profile
+    Godot -.->|GET /api/v1/status, /api/v1/monsters\nPOST /api/v1/gacha| Profile
 ```
 
-未ログイン状態では一覧・詳細の閲覧のみ可能。レシピ作成・編集、マイページ、お気に入り・コメント・評価はログインが必須で、`require_login` により未ログイン時は `/login` にリダイレクトされる。お気に入り登録・コメント投稿・★評価はレシピ詳細画面内での操作(Turbo Streamによる部分更新)であり、画面遷移は発生しない。パスワード再設定は、申請フォーム送信後にメールで送られるリンク(トークン付き、有効期限30分)経由で新パスワード設定画面に遷移する(破線の矢印)。
+未ログイン状態では一覧・詳細の閲覧のみ可能。レシピ作成・編集、マイページ、お気に入り・コメント・評価はログインが必須で、`require_login` により未ログイン時は `/login` にリダイレクトされる。お気に入り登録・コメント投稿・★評価はレシピ詳細画面内での操作(Turbo Streamによる部分更新)であり、画面遷移は発生しない。パスワード再設定は、申請フォーム送信後にメールで送られるリンク(トークン付き、有効期限30分)経由で新パスワード設定画面に遷移する(破線の矢印)。もう一方の破線(Godotクライアント→マイページ)は画面遷移ではなく、`/api/v1`経由のAPI通信(セッションではなくトークン認証)であることを示している。
 
 ## ER図
 
@@ -67,11 +79,84 @@ erDiagram
     RECIPE ||--o{ RECIPE_TAG : "持つ"
     TAG ||--o{ RECIPE_TAG : "付与される"
 
+    USER ||--o{ EXP_EVENT : "獲得する"
+    USER ||--o{ COIN_EVENT : "獲得する"
+    USER ||--o{ GACHA_PULL : "実行する"
+    USER ||--o{ USER_MONSTER : "所持する"
+    USER ||--o{ USER_TITLE : "獲得する"
+    USER ||--o{ API_TOKEN : "発行する"
+    USER }o--|| TITLE : "現在の称号(任意)"
+    TITLE ||--o{ USER_TITLE : "付与される"
+    MONSTER ||--o{ USER_MONSTER : "所持される"
+    MONSTER ||--o{ GACHA_PULL : "排出される(当たり時)"
+
     USER {
         bigint id PK
         string name
         string email UK
         string password_digest
+        integer level "デフォルト1、1〜100"
+        integer exp "デフォルト0、exp_eventsの累計キャッシュ"
+        integer coins "デフォルト0、coin_eventsの累計キャッシュ"
+        integer current_streak_days "デフォルト0"
+        integer longest_streak_days "デフォルト0"
+        date last_activity_on
+        bigint current_title_id FK "titles.id、任意"
+    }
+    TITLE {
+        bigint id PK
+        string name
+        integer min_level UK "この称号になる最低レベル"
+        integer rank UK
+    }
+    MONSTER {
+        bigint id PK
+        string name
+        integer rarity "デフォルト0"
+        string sprite_key "Godot側の表示キー、例: color:red;shape:circle"
+        text description
+        integer unlock_min_level "デフォルト1、ガチャで出現し得る最低レベル"
+    }
+    EXP_EVENT {
+        bigint id PK
+        bigint user_id FK
+        string source_type "recipe_post / login_streak"
+        bigint source_id "任意、レシピID等"
+        integer amount
+        date occurred_on
+    }
+    COIN_EVENT {
+        bigint id PK
+        bigint user_id FK
+        string source_type "recipe_post / gacha_pull"
+        bigint source_id "任意"
+        integer amount "ガチャ消費時は負数"
+        date occurred_on
+    }
+    GACHA_PULL {
+        bigint id PK
+        bigint user_id FK
+        bigint monster_id FK "任意、当たった場合のみ"
+        integer cost
+        boolean hit "デフォルトfalse"
+    }
+    USER_MONSTER {
+        bigint id PK
+        bigint user_id FK
+        bigint monster_id FK
+        date acquired_on
+    }
+    USER_TITLE {
+        bigint id PK
+        bigint user_id FK
+        bigint title_id FK
+        date awarded_on
+    }
+    API_TOKEN {
+        bigint id PK
+        bigint user_id FK
+        string token_digest UK "生トークンはSHA256でdigest化して保存"
+        datetime last_used_at
     }
     CATEGORY {
         bigint id PK
@@ -184,7 +269,9 @@ erDiagram
 npx @redocly/cli preview-docs docs/api/openapi.yaml
 ```
 
-このアプリはJSON APIではなくセッションベースのHTMLアプリのため、各エンドポイントのレスポンスは基本的に302リダイレクト or HTMLレンダリング(一部Turbo Streamに対応)。仕様書はフォームのパラメータとレスポンスの挙動を明文化する目的で作成している。
+このアプリの大部分はJSON APIではなくセッションベースのHTMLアプリのため、各エンドポイントのレスポンスは基本的に302リダイレクト or HTMLレンダリング(一部Turbo Streamに対応)。仕様書はフォームのパラメータとレスポンスの挙動を明文化する目的で作成している。
+
+一方、`/api/v1/*`(`api_v1`タグ)のみはGodotクライアント向けのJSON APIで、セッションではなく`POST /api/v1/auth`で発行するAPIトークン(`Authorization: Bearer <token>`ヘッダー)で認証する。ガチャの抽選ロジック自体は`Gamification::GachaPullService`に一元化されており、セッションベースの`POST /gacha`(マイページ用)とトークンベースの`POST /api/v1/gacha`(Godotクライアント用)はどちらも同じロジックを呼び出している。
 
 ## セットアップ
 
@@ -223,6 +310,18 @@ bin/rails server
 ```
 
 `http://localhost:3000` でアクセスできます。
+
+## Godotクライアント(任意)
+
+`godot-client/`に、レベル・EXP・称号・所持コイン・獲得モンスターの確認とガチャの実行ができるGodot 4製のデスクトップアプリを同梱している。Railsサーバー(`bin/rails server`)が起動していることが前提。
+
+1. [Godot 4.7](https://godotengine.org/)をインストールする
+2. Godotのプロジェクトマネージャーで「読み込み」から`godot-client/project.godot`を選択して開く
+3. エディタ右上の再生ボタン(▶)を押す
+4. ログイン画面で、Rails側に登録済みのメールアドレス・パスワードを入力してログインする(新規登録はWeb側の`/signup`から行う。Godot側にはアカウント作成機能はない)
+5. ログイン後、レベル/EXP/称号/所持コイン/獲得モンスターが表示され、「ガチャを回しに行く」ボタンからガチャ画面(コイン投入・演出・効果音付き)に遷移できる
+
+接続先のRails APIサーバーは`godot-client/scripts/api_client.gd`の`BASE_URL`定数(デフォルト`http://localhost:3000/api/v1`)で変更できる。
 
 ## テストの実行
 
