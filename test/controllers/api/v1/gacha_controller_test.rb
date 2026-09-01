@@ -7,7 +7,7 @@ class Api::V1::GachaControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create returns hit result with a valid token" do
-    monster = Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle", unlock_min_level: 1)
+    monster = Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle")
     result = Gamification::GachaPullService::Result.new(hit: true, monster: monster, error: nil)
 
     Gamification::GachaPullService.stub(:call, result) do

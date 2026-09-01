@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_27_121004) do
+ActiveRecord::Schema[7.1].define(version: 2026_09_01_114815) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -128,7 +128,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_27_121004) do
     t.integer "rarity", default: 0, null: false
     t.string "sprite_key", null: false
     t.text "description"
-    t.integer "unlock_min_level", default: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
