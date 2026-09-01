@@ -3,7 +3,7 @@ require "test_helper"
 class Gamification::GachaPullServiceTest < ActiveSupport::TestCase
   setup do
     @user = users(:one)
-    Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle", unlock_min_level: 1)
+    Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle")
   end
 
   test "returns an insufficient_coins error when the user does not have enough coins" do

@@ -15,21 +15,23 @@ end
   Title.find_or_create_by!(min_level: attrs[:min_level]) { |t| t.name = attrs[:name]; t.rank = attrs[:rank] }
 end
 
+# 初期実装時のプレースホルダー(色・形の自動描画)は、実際のイラスト素材に
+# 差し替えたため削除する。sprite_keyが"color:"で始まるものが旧プレースホルダー。
+Monster.where("sprite_key LIKE 'color:%'").destroy_all
+
 [
-  { name: "レッドトマトン",       sprite_key: "color:red;shape:circle",     unlock_min_level: 1,  description: "真っ赤なトマトのようなまん丸モンスター。" },
-  { name: "オレンジキャロッタ",   sprite_key: "color:orange;shape:triangle", unlock_min_level: 1,  description: "にんじんを思わせる三角形のモンスター。" },
-  { name: "イエローレモニー",     sprite_key: "color:yellow;shape:square",  unlock_min_level: 1,  description: "レモンのように爽やかな四角いモンスター。" },
-  { name: "グリーンキャベジオ",   sprite_key: "color:green;shape:circle",   unlock_min_level: 10, description: "キャベツを思わせる緑色のモンスター。" },
-  { name: "ブルーオニオス",       sprite_key: "color:blue;shape:triangle",  unlock_min_level: 10, description: "涙が出そうな青い三角モンスター。" },
-  { name: "パープルナスビー",     sprite_key: "color:purple;shape:square",  unlock_min_level: 25, description: "なすのような紫の四角モンスター。" },
-  { name: "ゴールドライサー",     sprite_key: "color:gold;shape:star",      unlock_min_level: 40, description: "黄金に輝く星形のモンスター。" },
-  { name: "シルバーフィッシュン", sprite_key: "color:silver;shape:star",    unlock_min_level: 60, description: "銀色に光る星形のモンスター。" },
-  { name: "レインボーシェフキング", sprite_key: "color:rainbow;shape:crown", unlock_min_level: 75, description: "虹色の王冠を戴くモンスター。" },
-  { name: "ダイヤモンドグルメット", sprite_key: "color:diamond;shape:crown", unlock_min_level: 90, description: "ダイヤモンドのように輝く王冠モンスター。" }
+  { name: "タマゴットン",     sprite_key: "egg_character.png",       description: "くりくりした目玉焼きのモンスター。" },
+  { name: "ミルクドロップ",   sprite_key: "milk.png",                description: "こぼれたミルクのしずくから生まれたモンスター。" },
+  { name: "パンケーキタワー", sprite_key: "pancake.png",             description: "ふわふわパンケーキを積み重ねたモンスター。" },
+  { name: "カプチーノン",     sprite_key: "coffee_character.png",    description: "湯気が立つコーヒーカップのモンスター。" },
+  { name: "アイスゴースト",   sprite_key: "ice.png",                 description: "ひんやりしたアイスクリームのお化けモンスター。" },
+  { name: "スパゲッティーニ", sprite_key: "spaghetti_character.png", description: "ミートボール付きスパゲッティのモンスター。" },
+  { name: "バーガーマン",     sprite_key: "hamburger_character.png", description: "ボリューム満点ハンバーガーのモンスター。" },
+  { name: "ラザニアン",       sprite_key: "lasagna_character.png",   description: "何層にも重なったラザニアのモンスター。" },
+  { name: "コーヒーゼリオ",   sprite_key: "cofeezeri.png",           description: "コーヒーゼリーにチェリーをのせたモンスター。" }
 ].each do |attrs|
   Monster.find_or_create_by!(name: attrs[:name]) do |m|
     m.sprite_key = attrs[:sprite_key]
-    m.unlock_min_level = attrs[:unlock_min_level]
     m.description = attrs[:description]
   end
 end

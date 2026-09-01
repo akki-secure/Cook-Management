@@ -4,7 +4,7 @@ class Api::V1::MonstersControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:one)
     @token = ApiToken.issue!(@user)
-    @monster = Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle", unlock_min_level: 1)
+    @monster = Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle")
     UserMonster.create!(user: @user, monster: @monster, acquired_on: Date.current)
   end
 

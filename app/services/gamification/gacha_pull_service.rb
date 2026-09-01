@@ -45,8 +45,9 @@ module Gamification
       rand < GachaRules::WIN_RATE
     end
 
+    # レベルによる出現制限は設けず、登録されている全モンスターから均等にランダム抽選する
     def pick_monster
-      Monster.where("unlock_min_level <= ?", user.level).order(Arel.sql("RAND()")).first
+      Monster.order(Arel.sql("RAND()")).first
     end
   end
 end

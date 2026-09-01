@@ -24,7 +24,7 @@ class GachaControllerTest < ActionDispatch::IntegrationTest
 
   test "shows a success notice on a hit" do
     sign_in_as(@user)
-    monster = Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle", unlock_min_level: 1)
+    monster = Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle")
     result = Gamification::GachaPullService::Result.new(hit: true, monster: monster, error: nil)
 
     Gamification::GachaPullService.stub(:call, result) do
