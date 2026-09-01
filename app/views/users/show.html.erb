@@ -24,7 +24,7 @@
   <h3>獲得モンスター (<%= current_user.monsters.count %>体)</h3>
   <% if current_user.monsters.any? %>
     <ul class="monster-list">
-      <% current_user.monsters.order(:unlock_min_level).each do |monster| %>
+      <% current_user.monsters.order(:name).each do |monster| %>
         <li><%= monster.name %></li>
       <% end %>
     </ul>

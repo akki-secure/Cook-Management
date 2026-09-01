@@ -45,6 +45,17 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "show displays acquired monsters without error" do
+    monster = Monster.create!(name: "テストモンスター", sprite_key: "egg_character.png")
+    UserMonster.create!(user: users(:one), monster: monster, acquired_on: Date.current)
+
+    sign_in_as(users(:one))
+    get profile_url
+
+    assert_response :success
+    assert_select "li", text: "テストモンスター"
+  end
+
   test "edit requires login" do
     get edit_profile_url
     assert_redirected_to login_url
