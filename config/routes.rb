@@ -21,6 +21,8 @@ Rails.application.routes.draw do
 
   post "gacha", to: "gacha#create"
 
+  resources :monsters, only: [ :index, :show ]
+
   namespace :api do
     namespace :v1 do
       post "auth", to: "sessions#create"

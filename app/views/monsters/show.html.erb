@@ -1,0 +1,37 @@
+<div class="detail-wrap">
+  <% if @prev_monster %>
+    <%= link_to "‹", monster_path(@prev_monster), class: "nav-btn", "aria-label": "前のモンスター" %>
+  <% else %>
+    <span class="nav-btn" aria-hidden="true"></span>
+  <% end %>
+
+  <div class="mon-card<%= " locked" unless @owned %>">
+    <div class="card-top">
+      <span class="no-tag">No.<%= format("%03d", @display_number) %></span>
+      <span class="type-tag"><%= @owned ? @monster.type_label : "未確認" %></span>
+    </div>
+    <div class="stage">
+      <% if @owned %>
+        <%= image_tag "monsters/#{@monster.sprite_key}", class: @monster.animation_class, alt: @monster.name %>
+      <% else %>
+        <%= image_tag "monsters/#{@monster.sprite_key}", alt: "未確認のモンスター" %>
+      <% end %>
+    </div>
+    <h2 class="name"><%= @owned ? @monster.name : "？？？" %></h2>
+    <p class="desc">
+      <% if @owned %>
+        <%= @monster.description %>
+      <% else %>
+        まだ出会っていないモンスターだ。ガチャで探してみよう。
+      <% end %>
+    </p>
+  </div>
+
+  <% if @next_monster %>
+    <%= link_to "›", monster_path(@next_monster), class: "nav-btn", "aria-label": "次のモンスター" %>
+  <% else %>
+    <span class="nav-btn" aria-hidden="true"></span>
+  <% end %>
+</div>
+
+<%= link_to "← 図鑑一覧へ戻る", monsters_path, class: "back-link" %>
