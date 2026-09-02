@@ -21,6 +21,14 @@
   <%= button_to "ガチャを回す(消費#{Gamification::GachaRules::COST}コイン)", gacha_path, method: :post, class: "btn",
         disabled: current_user.coins < Gamification::GachaRules::COST %>
 
+  <%= link_to monsters_path, class: "zukan-entry" do %>
+    <span class="book-btn" aria-hidden="true"><%= image_tag "cooking_book.png", alt: "" %></span>
+    <span class="copy">
+      <strong>モンスター図鑑</strong>
+      <span>集めたモンスターを見る(<%= current_user.monsters.count %> / <%= Monster.count %>体)</span>
+    </span>
+  <% end %>
+
   <h3>獲得モンスター (<%= current_user.monsters.count %>体)</h3>
   <% if current_user.monsters.any? %>
     <ul class="monster-list">

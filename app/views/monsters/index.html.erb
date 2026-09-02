@@ -1,0 +1,17 @@
+<h1>モンスター図鑑</h1>
+<p class="page-lead">レシピを記録してガチャを回すと、新しいモンスターに出会えます。</p>
+
+<div class="zukan-counter">所持数 <%= @owned_monster_ids.size %> / 全<%= @monsters.size %>体</div>
+
+<div class="zukan-grid">
+  <% @monsters.each_with_index do |monster, index| %>
+    <% owned = @owned_monster_ids.include?(monster.id) %>
+    <%= link_to monster_path(monster), class: "mon-tile#{" locked" unless owned}" do %>
+      <div class="tile-stage">
+        <%= image_tag "monsters/#{monster.sprite_key}", alt: (owned ? monster.name : "未確認のモンスター") %>
+      </div>
+      <div class="tile-no">No.<%= format("%03d", index + 1) %></div>
+      <div class="tile-name"><%= owned ? monster.name : "？？？" %></div>
+    <% end %>
+  <% end %>
+</div>
