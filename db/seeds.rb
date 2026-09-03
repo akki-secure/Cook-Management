@@ -35,3 +35,24 @@ Monster.where("sprite_key LIKE 'color:%'").destroy_all
     m.description = attrs[:description]
   end
 end
+
+# README記載のデモアカウント。新規登録なしですぐ動作確認できるようにするための固定データ。
+[
+  { name: "ウァッキー", email: "genki@example.com", password: "yoishou86!" },
+  { name: "デモ太郎",   email: "demo1@example.com", password: "demoPass123!" },
+  { name: "デモ花子",   email: "demo2@example.com", password: "demoPass456!" }
+].each do |attrs|
+  User.find_or_create_by!(email: attrs[:email]) do |u|
+    u.name = attrs[:name]
+    u.password = attrs[:password]
+    u.password_confirmation = attrs[:password]
+  end
+end
+
+# 図鑑・マイページの見た目をすぐ確認できるよう、代表アカウントに何体か持たせておく
+demo_user = User.find_by(email: "genki@example.com")
+if demo_user
+  Monster.order(:id).limit((Monster.count / 2.0).ceil).each do |monster|
+    UserMonster.find_or_create_by!(user: demo_user, monster: monster) { |um| um.acquired_on = Date.current }
+  end
+end
