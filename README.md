@@ -59,7 +59,7 @@ flowchart TD
     Profile -->|ログアウト| Login
 
     Profile -->|本アイコンボタン| ZukanIndex
-    Index -->|ヘッダー「モンスター図鑑」(ログイン済み)| ZukanIndex["モンスター図鑑(一覧)\n/monsters\n全モンスターをNo.順にグリッド表示\n未所持はシルエット+？？？"]
+    Index -->|"ヘッダー「モンスター図鑑」(ログイン済み)"| ZukanIndex["モンスター図鑑(一覧)\n/monsters\n全モンスターをNo.順にグリッド表示\n未所持はシルエット+？？？"]
     ZukanIndex -->|モンスターアイコンをクリック| ZukanShow["モンスター詳細\n/monsters/:id\nNo./種別タグ/説明文\n常時アニメーションするイラスト"]
     ZukanShow -->|前へ/次へ| ZukanShow
     ZukanShow -->|一覧へ戻る| ZukanIndex
