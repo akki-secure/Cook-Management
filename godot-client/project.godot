@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 [autoload]
 
 Api="*res://scripts/api_client.gd"
+MonsterBookState="*res://scripts/monster_book_state.gd"
 
 [display]
 

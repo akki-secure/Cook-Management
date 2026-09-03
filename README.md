@@ -370,8 +370,11 @@ bin/rails server
 3. エディタ右上の再生ボタン(▶)を押す
 4. ログイン画面で、Rails側に登録済みのメールアドレス・パスワードを入力してログインする(新規登録はWeb側の`/signup`から行う。Godot側にはアカウント作成機能はない)
 5. ログイン後、レベル/EXP/称号/所持コイン/獲得モンスターが表示され、「ガチャを回しに行く」ボタンからガチャ画面(コイン投入・演出・効果音付き)に遷移できる
+6. 「モンスター図鑑」ボタンから図鑑一覧に遷移できる。全モンスターをNo.順に表示し、未所持はシルエット+「？？？」になる。アイコンをタップすると詳細画面(No./種別タグ/名前/説明文、常時ループするアニメーション)が開き、「＜」「＞」で前後のモンスターに移動できる(先頭・末尾では該当ボタンがdisabledになる)
 
 接続先のRails APIサーバーは`godot-client/scripts/api_client.gd`の`BASE_URL`定数(デフォルト`http://localhost:3000/api/v1`)で変更できる。
+
+Web版と同様、図鑑一覧・詳細は`GET /api/v1/monsters/book`(所持有無に関わらず全モンスターを`owned`フラグ付きで返す、既存の`GET /api/v1/monsters`は所持モンスターのみを返す仕様のまま変更していない)を利用する。一覧→詳細のシーン遷移(`change_scene_to_file`はコンストラクタ引数を渡せない)には、取得したモンスター一覧と選択中のインデックスを保持するAutoload `MonsterBookState`(`godot-client/scripts/monster_book_state.gd`)を新設して使っている。アニメーションはWeb版CSSの6種(bounce/sway/hop/jiggle/spinhop/floaty)を`Tween`で再現しており、回転を伴うspinhopは`icon.pivot_offset`を中心に設定してから回転させている(足元を軸のままにすると、Web版のCSS実装で実際に発生した「回転時にキャラクターが名前テキストへはみ出す」不具合と同じ現象が起きるため)。
 
 ## テストの実行
 
