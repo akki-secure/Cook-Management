@@ -27,7 +27,9 @@ Rails.application.routes.draw do
     namespace :v1 do
       post "auth", to: "sessions#create"
       resource :status, only: [ :show ], controller: "status"
-      resources :monsters, only: [ :index ]
+      resources :monsters, only: [ :index ] do
+        collection { get :book }
+      end
       post "gacha", to: "gacha#create"
     end
   end
