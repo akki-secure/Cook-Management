@@ -53,6 +53,11 @@ layout_mode = 2
 text = "所持コイン: 0枚"
 horizontal_alignment = 1
 
+[node name="RainbowCoinLabel" type="Label" parent="VBox"]
+layout_mode = 2
+text = "所持レインボーコイン: 0枚"
+horizontal_alignment = 1
+
 [node name="GachaButton" type="Button" parent="VBox"]
 layout_mode = 2
 text = "ガチャを回しに行く"

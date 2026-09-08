@@ -6,6 +6,7 @@ extends Control
 @onready var exp_label: Label = $VBox/ExpLabel
 @onready var streak_label: Label = $VBox/StreakLabel
 @onready var coin_label: Label = $VBox/CoinLabel
+@onready var rainbow_coin_label: Label = $VBox/RainbowCoinLabel
 @onready var gacha_button: Button = $VBox/GachaButton
 @onready var book_button: Button = $VBox/BookButton
 @onready var battle_button: Button = $VBox/BattleButton
@@ -71,6 +72,7 @@ func _on_status_completed(_result: int, response_code: int, _headers: PackedStri
 
 	streak_label.text = "連続記録: %d日（最長 %d日）" % [data["current_streak_days"], data["longest_streak_days"]]
 	coin_label.text = "所持コイン: %d枚" % data.get("coins", 0)
+	rainbow_coin_label.text = "所持レインボーコイン: %d枚" % data.get("rainbow_coins", 0)
 
 func _on_monsters_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
 	if response_code != 200:

@@ -20,8 +20,12 @@ Rails.application.routes.draw do
   resources :ratings, only: [ :create ]
 
   post "gacha", to: "gacha#create"
+  post "gacha/seven", to: "gacha#seven"
 
   resources :monsters, only: [ :index, :show ]
+
+  resource :battle, only: [ :show ], controller: "battles"
+  post "battle_results", to: "battle_results#create"
 
   namespace :api do
     namespace :v1 do
@@ -31,6 +35,8 @@ Rails.application.routes.draw do
         collection { get :book }
       end
       post "gacha", to: "gacha#create"
+      post "gacha/seven", to: "gacha#seven"
+      post "battle_results", to: "battle_results#create"
     end
   end
 
