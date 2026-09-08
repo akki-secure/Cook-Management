@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cu2j13c24v3gv"
-path="res://.godot/imported/coin.png-27dfb1038e8df21d5a75fb158be57b4f.ctex"
+uid="uid://dudn2f0uqwbmq"
+path="res://.godot/imported/dragon_jelly.png-cb9c550979995df95f86f7d36a9910e4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/coins/coin.png"
-dest_files=["res://.godot/imported/coin.png-27dfb1038e8df21d5a75fb158be57b4f.ctex"]
+source_file="res://assets/monsters/dragon_jelly.png"
+dest_files=["res://.godot/imported/dragon_jelly.png-cb9c550979995df95f86f7d36a9910e4.ctex"]
 
 [params]
 

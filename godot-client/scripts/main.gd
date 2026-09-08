@@ -8,7 +8,9 @@ extends Control
 @onready var coin_label: Label = $VBox/CoinLabel
 @onready var gacha_button: Button = $VBox/GachaButton
 @onready var book_button: Button = $VBox/BookButton
+@onready var battle_button: Button = $VBox/BattleButton
 @onready var monster_grid: GridContainer = $VBox/MonsterScroll/MonsterGrid
+@onready var logout_button: Button = $VBox/LogoutButton
 @onready var status_request: HTTPRequest = $StatusRequest
 @onready var monsters_request: HTTPRequest = $MonstersRequest
 @onready var poll_timer: Timer = $PollTimer
@@ -20,6 +22,8 @@ func _ready() -> void:
 	monsters_request.request_completed.connect(_on_monsters_completed)
 	gacha_button.pressed.connect(_on_gacha_button_pressed)
 	book_button.pressed.connect(_on_book_button_pressed)
+	battle_button.pressed.connect(_on_battle_button_pressed)
+	logout_button.pressed.connect(_on_logout_button_pressed)
 	poll_timer.timeout.connect(refresh)
 	refresh()
 
@@ -28,6 +32,13 @@ func _on_gacha_button_pressed() -> void:
 
 func _on_book_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/MonsterBookScene.tscn")
+
+func _on_battle_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/BattleScene.tscn")
+
+func _on_logout_button_pressed() -> void:
+	Api.clear_token()
+	get_tree().change_scene_to_file("res://scenes/LoginScreen.tscn")
 
 ## 起動時と、Timer(30秒間隔)のたびに現在のレベル/EXP/モンスターを取得し直す。
 ## リアルタイム通知ではなく、ポーリングで十分という設計方針(WebSocketは将来拡張)。

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cu2j13c24v3gv"
-path="res://.godot/imported/coin.png-27dfb1038e8df21d5a75fb158be57b4f.ctex"
+uid="uid://0dbjks5175wk"
+path="res://.godot/imported/boss_hamburg_fire.png-3bdaf24606134028e7ef076c143e3b49.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/coins/coin.png"
-dest_files=["res://.godot/imported/coin.png-27dfb1038e8df21d5a75fb158be57b4f.ctex"]
+source_file="res://assets/monsters/boss_hamburg_fire.png"
+dest_files=["res://.godot/imported/boss_hamburg_fire.png-3bdaf24606134028e7ef076c143e3b49.ctex"]
 
 [params]
 

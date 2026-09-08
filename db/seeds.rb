@@ -20,20 +20,31 @@ end
 Monster.where("sprite_key LIKE 'color:%'").destroy_all
 
 [
-  { name: "タマゴットン",     sprite_key: "egg_character.png",       description: "くりくりした目玉焼きのモンスター。" },
-  { name: "ミルクドロップ",   sprite_key: "milk.png",                description: "こぼれたミルクのしずくから生まれたモンスター。" },
-  { name: "パンケーキタワー", sprite_key: "pancake.png",             description: "ふわふわパンケーキを積み重ねたモンスター。" },
-  { name: "カプチーノン",     sprite_key: "coffee_character.png",    description: "湯気が立つコーヒーカップのモンスター。" },
-  { name: "アイスゴースト",   sprite_key: "ice.png",                 description: "ひんやりしたアイスクリームのお化けモンスター。" },
-  { name: "スパゲッティーニ", sprite_key: "spaghetti_character.png", description: "ミートボール付きスパゲッティのモンスター。" },
-  { name: "バーガーマン",     sprite_key: "hamburger_character.png", description: "ボリューム満点ハンバーガーのモンスター。" },
-  { name: "ラザニアン",       sprite_key: "lasagna_character.png",   description: "何層にも重なったラザニアのモンスター。" },
-  { name: "コーヒーゼリオ",   sprite_key: "cofeezeri.png",           description: "コーヒーゼリーにチェリーをのせたモンスター。" }
+  { name: "タマゴットン",     sprite_key: "egg_character.png",       description: "くりくりした目玉焼きのモンスター。",                 hp: 90,  attack: 16 },
+  { name: "ミルクドロップ",   sprite_key: "milk.png",                description: "こぼれたミルクのしずくから生まれたモンスター。",       hp: 85,  attack: 15 },
+  { name: "パンケーキタワー", sprite_key: "pancake.png",             description: "ふわふわパンケーキを積み重ねたモンスター。",           hp: 100, attack: 18 },
+  { name: "カプチーノン",     sprite_key: "coffee_character.png",    description: "湯気が立つコーヒーカップのモンスター。",               hp: 88,  attack: 17 },
+  { name: "アイスゴースト",   sprite_key: "ice.png",                 description: "ひんやりしたアイスクリームのお化けモンスター。",       hp: 82,  attack: 20 },
+  { name: "スパゲッティーニ", sprite_key: "spaghetti_character.png", description: "ミートボール付きスパゲッティのモンスター。",           hp: 95,  attack: 19 },
+  { name: "バーガーマン",     sprite_key: "hamburger_character.png", description: "ボリューム満点ハンバーガーのモンスター。",             hp: 110, attack: 22 },
+  { name: "ラザニアン",       sprite_key: "lasagna_character.png",   description: "何層にも重なったラザニアのモンスター。",               hp: 130, attack: 23 },
+  { name: "コーヒーゼリオ",   sprite_key: "cofeezeri.png",           description: "コーヒーゼリーにチェリーをのせたモンスター。",         hp: 90,  attack: 18 },
+  { name: "チャーハニオン",   sprite_key: "fried_rice_character.png", description: "パラパラに炒められたチャーハンのモンスター。",       hp: 105, attack: 21 },
+  { name: "オニオニキュー",   sprite_key: "onion_character.png",     description: "涙もろい玉ねぎのモンスター。",                       hp: 88,  attack: 17 },
+  { name: "カキゴリラ",       sprite_key: "kakigori_character.png",  description: "夏の思い出が詰まったかき氷のモンスター。",             hp: 80,  attack: 15 },
+  { name: "カナッペット",     sprite_key: "canape.png",              description: "一口サイズでおしゃれなカナッペのモンスター。",         hp: 84,  attack: 19 },
+  { name: "ドラゴンゼリー",   sprite_key: "dragon_jelly.png",        description: "つやつや揺れるドラゴンの形をしたゼリーのモンスター。", hp: 92,  attack: 20 },
+  { name: "チリエビーノ",     sprite_key: "ebi_chili.png",           description: "ピリ辛ソースをまとったエビチリのモンスター。",         hp: 110, attack: 25 },
+  { name: "ピザーマン",       sprite_key: "pizza_man.png",           description: "焼きたてチーズがとろけるピザのモンスター。",           hp: 115, attack: 22 },
+  { name: "クシダンゴン",     sprite_key: "shish_kebab.png",         description: "色とりどりの具が刺さった串焼きのモンスター。",         hp: 98,  attack: 21 },
+  { name: "ヒエヒエソーメン", sprite_key: "somen.png",               description: "冷たいつゆで涼をとるそうめんのモンスター。",           hp: 86,  attack: 16 }
 ].each do |attrs|
-  Monster.find_or_create_by!(name: attrs[:name]) do |m|
-    m.sprite_key = attrs[:sprite_key]
-    m.description = attrs[:description]
-  end
+  monster = Monster.find_or_initialize_by(name: attrs[:name])
+  monster.sprite_key = attrs[:sprite_key]
+  monster.description = attrs[:description]
+  monster.hp = attrs[:hp]
+  monster.attack = attrs[:attack]
+  monster.save!
 end
 
 # README記載のデモアカウント。新規登録なしですぐ動作確認できるようにするための固定データ。

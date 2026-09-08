@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cu2j13c24v3gv"
-path="res://.godot/imported/coin.png-27dfb1038e8df21d5a75fb158be57b4f.ctex"
+uid="uid://tmg4ckxkh17t"
+path="res://.godot/imported/pizza_man.png-a2e9ab4dc7d0cb514d1e7144dc2ddf75.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/coins/coin.png"
-dest_files=["res://.godot/imported/coin.png-27dfb1038e8df21d5a75fb158be57b4f.ctex"]
+source_file="res://assets/monsters/pizza_man.png"
+dest_files=["res://.godot/imported/pizza_man.png-a2e9ab4dc7d0cb514d1e7144dc2ddf75.ctex"]
 
 [params]
 
