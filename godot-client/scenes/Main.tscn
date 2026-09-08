@@ -61,6 +61,10 @@ text = "ガチャを回しに行く"
 layout_mode = 2
 text = "モンスター図鑑"
 
+[node name="BattleButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = "対戦する"
+
 [node name="MonsterScroll" type="ScrollContainer" parent="VBox"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -69,6 +73,10 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 columns = 4
+
+[node name="LogoutButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = "ログアウト"
 
 [node name="StatusRequest" type="HTTPRequest" parent="."]
 

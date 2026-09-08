@@ -14,11 +14,15 @@ signal tapped
 const MONSTER_ASSET_DIR := "res://assets/monsters/"
 const LOCKED_TINT := Color(0.18, 0.18, 0.18, 1.0)
 
-func setup(monster_name: String, sprite_key: String, owned: bool = true) -> void:
+func setup(monster_name: String, sprite_key: String, owned: bool = true, show_name: bool = true) -> void:
 	var texture := load(MONSTER_ASSET_DIR + sprite_key)
 	if texture is Texture2D:
 		icon.texture = texture
+	else:
+		icon.texture = null
+		push_warning("monster_item: sprite not found or not imported: " + sprite_key)
 
+	name_label.visible = show_name
 	if owned:
 		name_label.text = monster_name
 		icon.modulate = Color.WHITE

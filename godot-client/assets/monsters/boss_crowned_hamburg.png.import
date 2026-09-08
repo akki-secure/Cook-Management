@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cu2j13c24v3gv"
-path="res://.godot/imported/coin.png-27dfb1038e8df21d5a75fb158be57b4f.ctex"
+uid="uid://dnf0o7xbhjqsp"
+path="res://.godot/imported/boss_crowned_hamburg.png-d61fe86ab80e5e4af3a68359440d4803.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/coins/coin.png"
-dest_files=["res://.godot/imported/coin.png-27dfb1038e8df21d5a75fb158be57b4f.ctex"]
+source_file="res://assets/monsters/boss_crowned_hamburg.png"
+dest_files=["res://.godot/imported/boss_crowned_hamburg.png-d61fe86ab80e5e4af3a68359440d4803.ctex"]
 
 [params]
 

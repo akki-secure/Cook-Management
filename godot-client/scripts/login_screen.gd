@@ -48,4 +48,4 @@ func _on_request_completed(_result: int, response_code: int, _headers: PackedStr
 func _go_to_main() -> void:
 	# _ready()の中(シーンツリーがまだノード追加処理中)から直接change_scene_to_fileを
 	# 呼ぶと "Parent node is busy..." エラーになるため、1フレーム遅らせて実行する。
-	get_tree().call_deferred("change_scene_to_file", "res://scenes/Main.tscn")
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/TitleScene.tscn")

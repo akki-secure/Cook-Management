@@ -18,7 +18,13 @@ class Monster < ApplicationRecord
     "cofeezeri.png" => "デザート",
     "fried_rice_character.png" => "がっつり",
     "onion_character.png" => "やさい",
-    "kakigori_character.png" => "なつのあじ"
+    "kakigori_character.png" => "なつのあじ",
+    "canape.png" => "おつまみ",
+    "dragon_jelly.png" => "デザート",
+    "ebi_chili.png" => "がっつり",
+    "pizza_man.png" => "がっつり",
+    "shish_kebab.png" => "がっつり",
+    "somen.png" => "めん類"
   }.freeze
 
   # 図鑑ページのアニメーション種別。sprite_keyに応じて6種類を割り当てる。
