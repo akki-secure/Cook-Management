@@ -49,4 +49,31 @@ class Api::V1::GachaControllerTest < ActionDispatch::IntegrationTest
     post api_v1_gacha_url
     assert_response :unauthorized
   end
+
+  test "seven returns pulls with a valid token" do
+    monster = Monster.create!(name: "テストモンスター", sprite_key: "color:red;shape:circle")
+    pulls = [ { hit: true, monster: monster } ] + Array.new(6) { { hit: false, monster: nil } }
+    result = Gamification::SevenGachaPullService::Result.new(pulls: pulls, error: nil)
+
+    Gamification::SevenGachaPullService.stub(:call, result) do
+      post api_v1_gacha_seven_url, headers: { "Authorization" => "Bearer #{@token.plain_token}" }
+    end
+
+    assert_response :created
+    json = JSON.parse(response.body)
+    assert_equal 7, json["pulls"].size
+    assert_equal "テストモンスター", json["pulls"].first["monster"]["name"]
+  end
+
+  test "seven returns an error when rainbow coins are insufficient" do
+    result = Gamification::SevenGachaPullService::Result.new(pulls: [], error: :insufficient_rainbow_coins)
+
+    Gamification::SevenGachaPullService.stub(:call, result) do
+      post api_v1_gacha_seven_url, headers: { "Authorization" => "Bearer #{@token.plain_token}" }
+    end
+
+    assert_response :unprocessable_entity
+    json = JSON.parse(response.body)
+    assert_equal "insufficient_rainbow_coins", json["error"]
+  end
 end

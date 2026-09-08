@@ -11,6 +11,17 @@ module Api
           render status: :created
         end
       end
+
+      def seven
+        @user = current_api_user
+        @result = Gamification::SevenGachaPullService.call(user: @user)
+
+        if @result.error == :insufficient_rainbow_coins
+          render json: { error: "insufficient_rainbow_coins" }, status: :unprocessable_entity
+        else
+          render status: :created
+        end
+      end
     end
   end
 end

@@ -1,0 +1,86 @@
+<h1>対戦</h1>
+
+<%
+  monsters_with_url = @owned_monsters.map { |m| m.merge(sprite_url: image_path("monsters/#{m[:sprite_key]}")) }
+  boss_data = {
+    name: "クラウンハンバーグ",
+    sprite_url: image_path("monsters/boss_crowned_hamburg.png"),
+    stage_sprite_urls: @boss_stage_sprite_keys.map { |key| image_path("monsters/#{key}") },
+    hp: 150,
+    attack: 18,
+    type_label: "がっつり"
+  }
+%>
+<div class="battle-app"
+     data-controller="battle"
+     data-battle-monsters-value="<%= monsters_with_url.to_json %>"
+     data-battle-boss-value="<%= boss_data.to_json %>"
+     data-battle-report-url-value="<%= battle_results_path %>"
+     data-battle-csrf-value="<%= form_authenticity_token %>">
+
+  <div data-battle-target="selectionPanel">
+    <div class="battle-mode-row">
+      <button type="button" class="btn" data-battle-target="selfModeButton" data-action="battle#chooseSelfMode">手持ち対戦</button>
+      <button type="button" class="btn btn-secondary" data-battle-target="bossModeButton" data-action="battle#chooseBossMode">ボス戦</button>
+    </div>
+
+    <p data-battle-target="instructionLabel">対戦する自分のモンスターを2体選んでください（1体目=自分、2体目=相手）</p>
+
+    <% if @owned_monsters.empty? %>
+      <p>まだモンスターを所持していません。ガチャでモンスターを手に入れてから挑戦してください。</p>
+    <% else %>
+      <div class="battle-monster-grid" data-battle-target="monsterGrid">
+        <% @owned_monsters.each_with_index do |monster, index| %>
+          <button type="button" class="battle-monster-tile" data-index="<%= index %>" data-action="battle#tapMonster">
+            <%= image_tag "monsters/#{monster[:sprite_key]}", alt: monster[:name] %>
+            <span><%= monster[:name] %></span>
+          </button>
+        <% end %>
+      </div>
+    <% end %>
+
+    <p>
+      <button type="button" class="btn" data-battle-target="startBattleButton" data-action="battle#startBattle" disabled>対戦開始</button>
+      <%= link_to "マイページに戻る", profile_path, class: "btn btn-secondary" %>
+    </p>
+  </div>
+
+  <div data-battle-target="battlePanel" hidden>
+    <p data-battle-target="turnLabel">あなたのターン</p>
+
+    <div class="battle-arena">
+      <div class="battle-platform battle-platform-player" data-battle-target="playerPlatform">
+        <div class="battle-shadow"></div>
+        <img data-battle-target="playerIcon" alt="">
+      </div>
+      <div class="battle-platform battle-platform-enemy" data-battle-target="enemyPlatform">
+        <div class="battle-shadow"></div>
+        <img data-battle-target="enemyIcon" alt="">
+      </div>
+      <div class="battle-projectile" data-battle-target="projectile" hidden></div>
+    </div>
+
+    <div class="battle-hud-row">
+      <div class="battle-hud">
+        <p data-battle-target="playerNameAtk"></p>
+        <div class="battle-hp-bar"><div class="battle-hp-bar-fill" data-battle-target="playerHpFill"></div></div>
+        <p data-battle-target="playerHpNum"></p>
+      </div>
+      <div class="battle-hud">
+        <p data-battle-target="enemyNameAtk"></p>
+        <div class="battle-hp-bar"><div class="battle-hp-bar-fill" data-battle-target="enemyHpFill"></div></div>
+        <p data-battle-target="enemyHpNum"></p>
+      </div>
+    </div>
+
+    <div class="battle-controls-row">
+      <button type="button" class="btn" data-battle-target="attackButton" data-action="battle#attack">こうげき</button>
+      <button type="button" class="btn" data-battle-target="jumpButton" data-action="battle#jump" disabled>ジャンプ</button>
+      <button type="button" class="btn" data-battle-target="guardButton" data-action="battle#guard" disabled>ガード</button>
+    </div>
+
+    <p data-battle-target="resultLabel"></p>
+
+    <button type="button" class="btn btn-secondary" data-action="battle#backToList">一覧に戻る</button>
+  </div>
+</div>

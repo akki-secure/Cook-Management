@@ -39,6 +39,7 @@ extends Control
 @onready var battle_back_button: Button = $VBox/BattlePanel/BattleVBox/BattleBackButton
 
 @onready var monsters_request: HTTPRequest = $MonstersRequest
+@onready var battle_result_request: HTTPRequest = $BattleResultRequest
 @onready var enemy_turn_timer: Timer = $EnemyTurnTimer
 @onready var next_turn_timer: Timer = $NextTurnTimer
 
@@ -106,6 +107,7 @@ func _ready() -> void:
 	jump_button.pressed.connect(_on_jump_pressed)
 	guard_button.pressed.connect(_on_guard_pressed)
 	monsters_request.request_completed.connect(_on_monsters_completed)
+	battle_result_request.request_completed.connect(_on_battle_result_completed)
 	enemy_turn_timer.timeout.connect(_resolve_enemy_attack)
 	next_turn_timer.timeout.connect(_on_next_turn_timer_timeout)
 
@@ -431,6 +433,31 @@ func _end_battle(player_won: bool) -> void:
 		result_label.text = "🎉 勝利！ %s を たおした！" % enemy_stats["name"]
 	else:
 		result_label.text = "💀 敗北… %s は たおれた" % player_stats["name"]
+
+	_report_battle_result(player_won)
+
+
+## 対戦結果をサーバーに報告する。ボス戦勝利時のみレインボーコインが1枚付与される。
+## レインボーコインという実質的な報酬が絡むため、通信結果を確認せず送りっぱなしに
+## せず、成功/失敗どちらもプレイヤーにわかる形で表示する。
+func _report_battle_result(player_won: bool) -> void:
+	var body := JSON.stringify({
+		"mode": mode,
+		"result": "win" if player_won else "lose",
+	})
+	var headers := Api.auth_headers()
+	headers.append("Content-Type: application/json")
+	battle_result_request.request(Api.BASE_URL + "/battle_results", headers, HTTPClient.METHOD_POST, body)
+
+
+func _on_battle_result_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if response_code != 200 and response_code != 201:
+		result_label.text += "\n⚠ 報酬の受け取りに失敗しました。通信環境をご確認ください。"
+		return
+
+	var data = JSON.parse_string(body.get_string_from_utf8())
+	if data is Dictionary and data.get("rainbow_coins_awarded", 0) > 0:
+		result_label.text += "\n🌈 レインボーコインを%d枚獲得！" % data["rainbow_coins_awarded"]
 
 
 func _shape_points(shape: String) -> PackedVector2Array:

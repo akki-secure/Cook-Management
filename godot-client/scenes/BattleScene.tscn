@@ -261,6 +261,8 @@ text = "一覧に戻る"
 
 [node name="MonstersRequest" type="HTTPRequest" parent="."]
 
+[node name="BattleResultRequest" type="HTTPRequest" parent="."]
+
 [node name="EnemyTurnTimer" type="Timer" parent="."]
 one_shot = true
 

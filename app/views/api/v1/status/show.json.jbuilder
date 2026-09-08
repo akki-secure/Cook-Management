@@ -5,3 +5,4 @@ json.current_title @user.current_title&.name
 json.current_streak_days @user.current_streak_days
 json.longest_streak_days @user.longest_streak_days
 json.coins @user.coins
+json.rainbow_coins @user.rainbow_coins

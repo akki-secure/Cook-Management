@@ -4,14 +4,19 @@ const COIN_START_POS := Vector2(144, 0)
 const COIN_DROP_Y := 140.0
 
 @onready var coin_count_label: Label = $VBox/CoinCountLabel
+@onready var rainbow_coin_count_label: Label = $VBox/RainbowCoinCountLabel
 @onready var machine_sprite: TextureRect = $VBox/MachineArea/MachineSprite
 @onready var coin_sprite: TextureRect = $VBox/MachineArea/CoinSprite
 @onready var reveal_holder: Control = $VBox/MachineArea/RevealHolder
+@onready var seven_result_scroll: ScrollContainer = $VBox/SevenResultScroll
+@onready var seven_result_row: HBoxContainer = $VBox/SevenResultScroll/SevenResultRow
 @onready var result_label: Label = $VBox/ResultLabel
 @onready var pull_button: Button = $VBox/PullButton
+@onready var seven_pull_button: Button = $VBox/SevenPullButton
 @onready var back_button: Button = $VBox/BackButton
 @onready var status_request: HTTPRequest = $StatusRequest
 @onready var gacha_request: HTTPRequest = $GachaRequest
+@onready var seven_gacha_request: HTTPRequest = $SevenGachaRequest
 @onready var coin_sound: AudioStreamPlayer = $CoinSound
 @onready var spin_sound: AudioStreamPlayer = $SpinSound
 @onready var hit_sound: AudioStreamPlayer = $HitSound
@@ -20,7 +25,9 @@ const COIN_DROP_Y := 140.0
 const MonsterItemScene := preload("res://scenes/MonsterItem.tscn")
 
 var current_coins: int = 0
+var current_rainbow_coins: int = 0
 var gacha_cost: int = 1
+var seven_gacha_cost: int = 1
 var is_pulling: bool = false
 
 ## コイン投入アニメーションとAPIリクエストが両方終わってから結果を見せるための
@@ -29,15 +36,18 @@ var animation_done: bool = false
 var response_done: bool = false
 var pending_data = null
 var pending_message: String = ""
+var is_seven_pull: bool = false
 
 func _ready() -> void:
 	machine_sprite.pivot_offset = machine_sprite.size / 2
 	coin_sprite.position = COIN_START_POS
 
 	pull_button.pressed.connect(_on_pull_pressed)
+	seven_pull_button.pressed.connect(_on_seven_pull_pressed)
 	back_button.pressed.connect(_on_back_pressed)
 	status_request.request_completed.connect(_on_status_completed)
 	gacha_request.request_completed.connect(_on_gacha_completed)
+	seven_gacha_request.request_completed.connect(_on_seven_gacha_completed)
 
 	fetch_status()
 
@@ -51,20 +61,26 @@ func _on_status_completed(_result: int, response_code: int, _headers: PackedStri
 	var data = JSON.parse_string(body.get_string_from_utf8())
 	if data is Dictionary:
 		current_coins = data.get("coins", 0)
+		current_rainbow_coins = data.get("rainbow_coins", 0)
 		_update_coin_label()
 
 func _update_coin_label() -> void:
 	coin_count_label.text = "所持コイン: %d枚" % current_coins
+	rainbow_coin_count_label.text = "所持レインボーコイン: %d枚" % current_rainbow_coins
 	pull_button.disabled = is_pulling or current_coins < gacha_cost
+	seven_pull_button.disabled = is_pulling or current_rainbow_coins < seven_gacha_cost
 
 func _on_pull_pressed() -> void:
 	if is_pulling:
 		return
 
 	is_pulling = true
+	is_seven_pull = false
 	pull_button.disabled = true
+	seven_pull_button.disabled = true
 	result_label.text = ""
 	_clear_reveal()
+	seven_result_scroll.visible = false
 
 	animation_done = false
 	response_done = false
@@ -73,6 +89,26 @@ func _on_pull_pressed() -> void:
 
 	_play_coin_drop_animation()
 	gacha_request.request(Api.BASE_URL + "/gacha", Api.auth_headers(), HTTPClient.METHOD_POST)
+
+func _on_seven_pull_pressed() -> void:
+	if is_pulling:
+		return
+
+	is_pulling = true
+	is_seven_pull = true
+	pull_button.disabled = true
+	seven_pull_button.disabled = true
+	result_label.text = ""
+	_clear_reveal()
+	seven_result_scroll.visible = false
+
+	animation_done = false
+	response_done = false
+	pending_data = null
+	pending_message = ""
+
+	_play_coin_drop_animation()
+	seven_gacha_request.request(Api.BASE_URL + "/gacha/seven", Api.auth_headers(), HTTPClient.METHOD_POST)
 
 ## コインが落ちる → ガチャマシンが揺れる、の順にアニメーションさせる。
 ## この絵はあくまで「回した」ことを伝える演出で、実際のコイン消費計算は
@@ -113,12 +149,26 @@ func _on_gacha_completed(_result: int, response_code: int, _headers: PackedStrin
 	response_done = true
 	_try_finish()
 
+func _on_seven_gacha_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if response_code == 201:
+		pending_data = JSON.parse_string(body.get_string_from_utf8())
+	elif response_code == 422:
+		pending_message = "レインボーコインが足りません。"
+	else:
+		pending_message = "通信エラーが発生しました。"
+
+	response_done = true
+	_try_finish()
+
 func _try_finish() -> void:
 	if not (animation_done and response_done):
 		return
 
 	if pending_data is Dictionary:
-		_show_result(pending_data)
+		if is_seven_pull:
+			_show_seven_result(pending_data)
+		else:
+			_show_result(pending_data)
 	else:
 		result_label.text = pending_message
 
@@ -145,6 +195,32 @@ func _show_result(data: Dictionary) -> void:
 		tween.tween_property(item, "modulate:a", 1.0, 0.25)
 	else:
 		result_label.text = "ハズレでした…また挑戦してください。"
+		miss_sound.play()
+
+## 7連ガチャの結果を、獲得数のサマリーテキスト+横並びのモンスターアイコン列で見せる。
+func _show_seven_result(data: Dictionary) -> void:
+	var pulls = data.get("pulls", [])
+	var hit_count := 0
+
+	for child in seven_result_row.get_children():
+		child.queue_free()
+
+	for pull in pulls:
+		var monster = pull.get("monster")
+		if pull.get("hit", false) and monster is Dictionary:
+			hit_count += 1
+			var item := MonsterItemScene.instantiate()
+			seven_result_row.add_child(item)
+			item.setup(monster["name"], monster["sprite_key"])
+		# ハズレの回はタイルを作らず、獲得できた分だけ横並びで見せる。
+
+	seven_result_scroll.visible = true
+
+	if hit_count > 0:
+		result_label.text = "🌈 7連ガチャで%d体獲得！" % hit_count
+		hit_sound.play()
+	else:
+		result_label.text = "🌈 7連ガチャ…残念、今回は全てハズレでした。"
 		miss_sound.play()
 
 func _clear_reveal() -> void:
