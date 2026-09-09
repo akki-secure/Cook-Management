@@ -47,10 +47,10 @@
     <span class="book-btn" aria-hidden="true"><%= image_tag "cooking_book.png", alt: "" %></span>
     <span class="copy">
       <strong>モンスター図鑑</strong>
-      <span>集めたモンスターを見る(<%= current_user.monsters.distinct.count %> / <%= Monster.count %>体)</span>
+      <span>集めたモンスターを見る(<%= @owned_monster_count %> / <%= Monster.count %>体)</span>
     </span>
   <% end %>
-  <% if current_user.monsters.none? %>
+  <% if @owned_monster_count.zero? %>
     <p class="page-lead">まだモンスターを獲得していません。写真付きでレシピを投稿してみましょう。</p>
   <% end %>
 </div>

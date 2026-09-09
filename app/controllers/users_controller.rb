@@ -18,6 +18,7 @@ class UsersController < ApplicationController
 
   def show
     @recipes = current_user.recipes
+    @owned_monster_count = current_user.monsters.count
   end
 
   def edit

@@ -16,7 +16,6 @@
   border-radius: 8px;
   overflow-x: auto;
   overflow-y: hidden;
-  pointer-events: none;
   user-select: none;
 }
 

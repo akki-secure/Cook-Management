@@ -12,10 +12,10 @@
           <span class="logo"><span class="help-badge">1</span>レシピ管理</span>
           <nav>
             <span>使い方(今のページ)</span>
-            <span><span class="help-badge">2</span>新規レシピ</span>
-            <span><span class="help-badge">3</span>マイページ</span>
-            <span><span class="help-badge">4</span>モンスター図鑑</span>
-            <span class="current-user user-menu-trigger"><span class="help-badge">5</span>ゲストさん</span>
+            <% @logged_in_items.each do |item| %>
+              <span><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></span>
+            <% end %>
+            <span class="current-user user-menu-trigger"><span class="help-badge"><%= @logged_in_items.size + 2 %></span>ゲストさん</span>
           </nav>
         </div>
       </div>
@@ -26,20 +26,14 @@
         <p class="help-callout__title"><span class="help-badge">1</span>レシピ管理(ロゴ)</p>
         <p class="help-callout__desc">ホームに戻る<br>ここを押すと、いつでもレシピ一覧のトップページに戻れます。</p>
       </div>
+      <% @logged_in_items.each do |item| %>
+        <div class="help-callout">
+          <p class="help-callout__title"><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></p>
+          <p class="help-callout__desc"><%= item[:title] %><br><%= item[:desc] %></p>
+        </div>
+      <% end %>
       <div class="help-callout">
-        <p class="help-callout__title"><span class="help-badge">2</span>新規レシピ</p>
-        <p class="help-callout__desc">レシピを追加する<br>新しい料理のレシピを登録できます。</p>
-      </div>
-      <div class="help-callout">
-        <p class="help-callout__title"><span class="help-badge">3</span>マイページ</p>
-        <p class="help-callout__desc">自分の状況をまとめて見る<br>レベル・コイン・連続記録日数や、自分が投稿したレシピなどを確認できます。</p>
-      </div>
-      <div class="help-callout">
-        <p class="help-callout__title"><span class="help-badge">4</span>モンスター図鑑</p>
-        <p class="help-callout__desc">モンスターをじっくり見る<br>ガチャで手に入れたモンスターを、イラスト付きの専用ページで一覧・詳細表示できます。まだ持っていないモンスターはシルエットで表示されます。</p>
-      </div>
-      <div class="help-callout">
-        <p class="help-callout__title"><span class="help-badge">5</span>「〇〇さん」(自分の名前)</p>
+        <p class="help-callout__title"><span class="help-badge"><%= @logged_in_items.size + 2 %></span>「〇〇さん」(自分の名前)</p>
         <p class="help-callout__desc">ログアウトする<br>ここを開くと「ログアウト」ボタンが出てきます。使い終わったらここから安全に終了できます。</p>
       </div>
     </div>
@@ -57,22 +51,21 @@
           <span class="logo">レシピ管理</span>
           <nav>
             <span>使い方(今のページ)</span>
-            <span><span class="help-badge">1</span>ログイン</span>
-            <span><span class="help-badge">2</span>新規登録</span>
+            <% @logged_out_items.each do |item| %>
+              <span><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></span>
+            <% end %>
           </nav>
         </div>
       </div>
     </div>
 
     <div class="help-callouts">
-      <div class="help-callout">
-        <p class="help-callout__title"><span class="help-badge">1</span>ログイン</p>
-        <p class="help-callout__desc">すでに登録した人はこちら<br>アカウントをお持ちの方は、ここからログインします。</p>
-      </div>
-      <div class="help-callout">
-        <p class="help-callout__title"><span class="help-badge">2</span>新規登録</p>
-        <p class="help-callout__desc">はじめての方はこちら<br>まだアカウントがない方は、ここから新規登録できます。</p>
-      </div>
+      <% @logged_out_items.each do |item| %>
+        <div class="help-callout">
+          <p class="help-callout__title"><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></p>
+          <p class="help-callout__desc"><%= item[:title] %><br><%= item[:desc] %></p>
+        </div>
+      <% end %>
     </div>
   </div>
 </section>
