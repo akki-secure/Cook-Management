@@ -14,7 +14,7 @@ class User < ApplicationRecord
   has_many :coin_events, dependent: :destroy
   has_many :gacha_pulls, dependent: :destroy
   has_many :user_monsters, dependent: :destroy
-  has_many :monsters, through: :user_monsters
+  has_many :monsters, -> { distinct }, through: :user_monsters
   has_many :user_titles, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
   belongs_to :current_title, class_name: "Title", optional: true

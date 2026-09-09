@@ -1,0 +1,71 @@
+<h1>使い方</h1>
+<p class="page-lead">このアプリでは、どのページを開いても、画面の一番上に同じメニュー(お知らせやボタンが並んだ部分)が表示されます。まずはこのメニューに何があるか、番号ごとに説明します。</p>
+
+<section class="help-section">
+  <h2>①ログインした後に、画面の上に出てくるメニュー</h2>
+  <p class="page-lead">アカウントでログインすると、画面の上に次のようなメニューが表示されます。同じ丸数字が付いた説明を下から探してください。</p>
+
+  <div class="help-mockup">
+    <div class="help-mockup__replica" aria-hidden="true">
+      <div class="site-header">
+        <div class="container">
+          <span class="logo"><span class="help-badge">1</span>レシピ管理</span>
+          <nav>
+            <span>使い方(今のページ)</span>
+            <% @logged_in_items.each do |item| %>
+              <span><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></span>
+            <% end %>
+            <span class="current-user user-menu-trigger"><span class="help-badge"><%= @logged_in_items.size + 2 %></span>ゲストさん</span>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-callouts">
+      <div class="help-callout">
+        <p class="help-callout__title"><span class="help-badge">1</span>レシピ管理(ロゴ)</p>
+        <p class="help-callout__desc">ホームに戻る<br>ここを押すと、いつでもレシピ一覧のトップページに戻れます。</p>
+      </div>
+      <% @logged_in_items.each do |item| %>
+        <div class="help-callout">
+          <p class="help-callout__title"><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></p>
+          <p class="help-callout__desc"><%= item[:title] %><br><%= item[:desc] %></p>
+        </div>
+      <% end %>
+      <div class="help-callout">
+        <p class="help-callout__title"><span class="help-badge"><%= @logged_in_items.size + 2 %></span>「〇〇さん」(自分の名前)</p>
+        <p class="help-callout__desc">ログアウトする<br>ここを開くと「ログアウト」ボタンが出てきます。使い終わったらここから安全に終了できます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="help-section">
+  <h2>②まだログインしていない時に出てくるメニュー</h2>
+  <p class="page-lead">アカウントを作る前・ログインする前は、代わりに次の2つのボタンが表示されます。</p>
+
+  <div class="help-mockup">
+    <div class="help-mockup__replica" aria-hidden="true">
+      <div class="site-header">
+        <div class="container">
+          <span class="logo">レシピ管理</span>
+          <nav>
+            <span>使い方(今のページ)</span>
+            <% @logged_out_items.each do |item| %>
+              <span><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></span>
+            <% end %>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-callouts">
+      <% @logged_out_items.each do |item| %>
+        <div class="help-callout">
+          <p class="help-callout__title"><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></p>
+          <p class="help-callout__desc"><%= item[:title] %><br><%= item[:desc] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

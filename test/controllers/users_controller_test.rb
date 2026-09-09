@@ -45,7 +45,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "show displays acquired monsters without error" do
+  test "show displays acquired monster count without error" do
     monster = Monster.create!(name: "テストモンスター", sprite_key: "egg_character.png")
     UserMonster.create!(user: users(:one), monster: monster, acquired_on: Date.current)
 
@@ -53,7 +53,18 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     get profile_url
 
     assert_response :success
-    assert_select "li", text: "テストモンスター"
+    assert_match "集めたモンスターを見る(1 / 1体)", response.body
+  end
+
+  test "show counts a monster acquired multiple times via gacha only once" do
+    monster = Monster.create!(name: "テストモンスター", sprite_key: "egg_character.png")
+    3.times { UserMonster.create!(user: users(:one), monster: monster, acquired_on: Date.current) }
+
+    sign_in_as(users(:one))
+    get profile_url
+
+    assert_response :success
+    assert_match "集めたモンスターを見る(1 / 1体)", response.body
   end
 
   test "edit requires login" do
