@@ -1,0 +1,79 @@
+/* ---- 使い方(ヘルプ)ページ ---- */
+.help-section {
+  margin-bottom: 40px;
+}
+
+.help-mockup {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.help-mockup__replica {
+  border: 1px dashed #e8d3ae;
+  border-radius: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.help-mockup__replica .site-header {
+  border-bottom: none;
+}
+
+.help-mockup__replica .site-header .container {
+  width: max-content;
+  min-width: 100%;
+}
+
+.help-mockup__replica nav {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.help-mockup__replica nav span {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.help-callouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.help-callout {
+  flex: 1 1 160px;
+  background: #fff8ef;
+  border: 1px solid #e8d3ae;
+  border-radius: 10px;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.help-callout__arrow {
+  display: block;
+  color: #c0392b;
+  font-size: 1.4rem;
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.help-callout__title {
+  margin: 0 0 6px;
+  font-weight: bold;
+  color: var(--primary);
+  font-size: 0.95rem;
+}
+
+.help-callout__desc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.6;
+}
