@@ -55,17 +55,31 @@
   text-align: center;
 }
 
-.help-callout__arrow {
-  display: block;
-  color: #c0392b;
-  font-size: 1.4rem;
+.help-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #c0392b;
+  color: #fff;
+  font-size: 0.75rem;
   font-weight: bold;
   line-height: 1;
-  margin-bottom: 4px;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.help-mockup__replica .help-badge {
+  vertical-align: middle;
 }
 
 .help-callout__title {
   margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: bold;
   color: var(--primary);
   font-size: 0.95rem;
