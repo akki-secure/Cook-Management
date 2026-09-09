@@ -62,7 +62,7 @@ Web版(Rails)とGodot版(デスクトップゲームクライアント)の両方
 
 ### Godot版 `HelpScene`
 
-- メイン画面(`Main.tscn`)の`VBoxContainer`のボタン配置を非活性(押せない・見た目だけ同じ)で再現したモックアップに、矢印(`Line2D`+`Polygon2D`)と吹き出し(`PanelContainer`+`Label`)を重ねて次の項目を説明する:
+- メイン画面(`Main.tscn`)の`VBoxContainer`のボタン配置を非活性(押せない・見た目だけ同じ)で再現したモックアップの下に、矢印付きの吹き出し(`PanelContainer`+`Label`、Web版と同じ「↑」表記)を並べて次の項目を説明する:
   - ガチャを回しに行く
   - モンスター図鑑
   - 対戦する
