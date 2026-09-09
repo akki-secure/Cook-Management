@@ -58,6 +58,10 @@ layout_mode = 2
 text = "所持レインボーコイン: 0枚"
 horizontal_alignment = 1
 
+[node name="HelpButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = "使い方"
+
 [node name="GachaButton" type="Button" parent="VBox"]
 layout_mode = 2
 text = "ガチャを回しに行く"

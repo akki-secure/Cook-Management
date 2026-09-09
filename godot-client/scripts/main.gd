@@ -7,6 +7,7 @@ extends Control
 @onready var streak_label: Label = $VBox/StreakLabel
 @onready var coin_label: Label = $VBox/CoinLabel
 @onready var rainbow_coin_label: Label = $VBox/RainbowCoinLabel
+@onready var help_button: Button = $VBox/HelpButton
 @onready var gacha_button: Button = $VBox/GachaButton
 @onready var book_button: Button = $VBox/BookButton
 @onready var battle_button: Button = $VBox/BattleButton
@@ -21,12 +22,16 @@ const MonsterItemScene := preload("res://scenes/MonsterItem.tscn")
 func _ready() -> void:
 	status_request.request_completed.connect(_on_status_completed)
 	monsters_request.request_completed.connect(_on_monsters_completed)
+	help_button.pressed.connect(_on_help_button_pressed)
 	gacha_button.pressed.connect(_on_gacha_button_pressed)
 	book_button.pressed.connect(_on_book_button_pressed)
 	battle_button.pressed.connect(_on_battle_button_pressed)
 	logout_button.pressed.connect(_on_logout_button_pressed)
 	poll_timer.timeout.connect(refresh)
 	refresh()
+
+func _on_help_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/HelpScene.tscn")
 
 func _on_gacha_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/GachaScene.tscn")
