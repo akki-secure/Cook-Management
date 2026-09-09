@@ -56,6 +56,17 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_match "集めたモンスターを見る(1 / 1体)", response.body
   end
 
+  test "show counts a monster acquired multiple times via gacha only once" do
+    monster = Monster.create!(name: "テストモンスター", sprite_key: "egg_character.png")
+    3.times { UserMonster.create!(user: users(:one), monster: monster, acquired_on: Date.current) }
+
+    sign_in_as(users(:one))
+    get profile_url
+
+    assert_response :success
+    assert_match "集めたモンスターを見る(1 / 1体)", response.body
+  end
+
   test "edit requires login" do
     get edit_profile_url
     assert_redirected_to login_url

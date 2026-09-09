@@ -47,7 +47,7 @@
     <span class="book-btn" aria-hidden="true"><%= image_tag "cooking_book.png", alt: "" %></span>
     <span class="copy">
       <strong>モンスター図鑑</strong>
-      <span>集めたモンスターを見る(<%= current_user.monsters.count %> / <%= Monster.count %>体)</span>
+      <span>集めたモンスターを見る(<%= current_user.monsters.distinct.count %> / <%= Monster.count %>体)</span>
     </span>
   <% end %>
   <% if current_user.monsters.none? %>

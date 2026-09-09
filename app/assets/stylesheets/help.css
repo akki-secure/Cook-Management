@@ -34,7 +34,7 @@
   white-space: nowrap;
 }
 
-.help-mockup__replica nav span {
+.help-mockup__replica nav span:not(.help-badge) {
   color: var(--text);
   text-decoration: none;
 }
