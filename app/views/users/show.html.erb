@@ -50,16 +50,8 @@
       <span>集めたモンスターを見る(<%= current_user.monsters.count %> / <%= Monster.count %>体)</span>
     </span>
   <% end %>
-
-  <h3>獲得モンスター (<%= current_user.monsters.count %>体)</h3>
-  <% if current_user.monsters.any? %>
-    <ul class="monster-list">
-      <% current_user.monsters.order(:name).each do |monster| %>
-        <li><%= monster.name %></li>
-      <% end %>
-    </ul>
-  <% else %>
-    <p>まだモンスターを獲得していません。写真付きでレシピを投稿してみましょう。</p>
+  <% if current_user.monsters.none? %>
+    <p class="page-lead">まだモンスターを獲得していません。写真付きでレシピを投稿してみましょう。</p>
   <% end %>
 </div>
 
