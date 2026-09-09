@@ -37,7 +37,10 @@ Monster.where("sprite_key LIKE 'color:%'").destroy_all
   { name: "チリエビーノ",     sprite_key: "ebi_chili.png",           description: "ピリ辛ソースをまとったエビチリのモンスター。",         hp: 110, attack: 25 },
   { name: "ピザーマン",       sprite_key: "pizza_man.png",           description: "焼きたてチーズがとろけるピザのモンスター。",           hp: 115, attack: 22 },
   { name: "クシダンゴン",     sprite_key: "shish_kebab.png",         description: "色とりどりの具が刺さった串焼きのモンスター。",         hp: 98,  attack: 21 },
-  { name: "ヒエヒエソーメン", sprite_key: "somen.png",               description: "冷たいつゆで涼をとるそうめんのモンスター。",           hp: 86,  attack: 16 }
+  { name: "ヒエヒエソーメン", sprite_key: "somen.png",               description: "冷たいつゆで涼をとるそうめんのモンスター。",           hp: 86,  attack: 16 },
+  { name: "メロンゼリオ",     sprite_key: "green_jelly.png",         description: "つやつや揺れるメロン味のゼリーのモンスター。",         hp: 85,  attack: 17 },
+  { name: "ソーダゼリオ",     sprite_key: "blue_jelly.png",          description: "しゅわしゅわ弾けるソーダ味のゼリーのモンスター。",     hp: 83,  attack: 16 },
+  { name: "ショートケーキング", sprite_key: "sponge_cake.png",       description: "いちごをのせた王様級のショートケーキのモンスター。",   hp: 100, attack: 19 }
 ].each do |attrs|
   monster = Monster.find_or_initialize_by(name: attrs[:name])
   monster.sprite_key = attrs[:sprite_key]
