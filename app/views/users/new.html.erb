@@ -21,6 +21,8 @@
     <%= f.email_field :email, required: true %>
   </div>
 
+  <%= render "avatar_fields", f: f %>
+
   <div class="form-group" data-controller="password-visibility">
     <%= f.label :password do %>パスワード(8文字以上)<span class="required-mark">※</span><% end %>
     <%= f.password_field :password, required: true, data: { password_visibility_target: "input" } %>

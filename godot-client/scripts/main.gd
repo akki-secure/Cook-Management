@@ -1,5 +1,8 @@
 extends Control
 
+const AVATAR_ASSET_DIR := "res://assets/avatars/"
+
+@onready var avatar_icon: TextureRect = $VBox/AvatarIcon
 @onready var title_label: Label = $VBox/TitleLabel
 @onready var level_label: Label = $VBox/LevelLabel
 @onready var exp_bar: ProgressBar = $VBox/ExpBar
@@ -60,6 +63,15 @@ func _on_status_completed(_result: int, response_code: int, _headers: PackedStri
 	var data = JSON.parse_string(body.get_string_from_utf8())
 	if not (data is Dictionary):
 		return
+
+	var avatar_key = data.get("avatar_key")
+	if avatar_key:
+		var avatar_texture := load(AVATAR_ASSET_DIR + avatar_key + ".png")
+		if avatar_texture is Texture2D:
+			avatar_icon.texture = avatar_texture
+		else:
+			avatar_icon.texture = null
+			push_warning("main: avatar sprite not found or not imported: " + avatar_key)
 
 	title_label.text = data.get("current_title", "") if data.get("current_title") else "称号なし"
 	level_label.text = "Lv. %d" % data["level"]

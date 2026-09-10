@@ -34,6 +34,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "create accepts a chosen avatar_key" do
+    assert_difference "User.count", 1 do
+      post signup_url, params: { user: valid_params[:user].merge(avatar_key: "chef_female") }
+    end
+
+    user = User.order(:created_at).last
+    assert_equal "chef_female", user.avatar_key
+  end
+
   test "show requires login" do
     get profile_url
     assert_redirected_to login_url
@@ -101,5 +110,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     patch profile_url, params: { user: { name: users(:one).name, email: "not-an-email", password: "", password_confirmation: "" } }
 
     assert_response :unprocessable_entity
+  end
+
+  test "update changes avatar_key" do
+    sign_in_as(users(:one))
+
+    patch profile_url, params: { user: { name: users(:one).name, email: users(:one).email, avatar_key: "chef_female", password: "", password_confirmation: "" } }
+
+    assert_redirected_to profile_url
+    assert_equal "chef_female", users(:one).reload.avatar_key
   end
 end

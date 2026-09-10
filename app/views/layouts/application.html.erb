@@ -21,7 +21,10 @@
               <%= link_to item[:label], item[:url] %>
             <% end %>
             <details class="user-menu" data-controller="dropdown" data-dropdown-target="menu">
-              <summary class="current-user user-menu-trigger"><%= current_user.name %>さん</summary>
+              <summary class="current-user user-menu-trigger">
+                <%= image_tag "avatars/#{current_user.avatar_key}.png", alt: "", class: "avatar-icon avatar-icon--small" %>
+                <%= current_user.name %>さん
+              </summary>
               <div class="user-menu-list">
                 <%= button_to "ログアウト", logout_path, method: :delete, class: "link-button" %>
               </div>

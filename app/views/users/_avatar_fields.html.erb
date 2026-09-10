@@ -1,0 +1,12 @@
+<div class="form-group">
+  <%= f.label :avatar_key, "アイコン" %>
+  <div class="avatar-choices">
+    <% User::AVATAR_KEYS.each do |key| %>
+      <label class="avatar-choice">
+        <%= f.radio_button :avatar_key, key, checked: (f.object.avatar_key || "chef_male") == key %>
+        <%= image_tag "avatars/#{key}.png", alt: "", class: "avatar-choice__img" %>
+        <span><%= key == "chef_male" ? "男性" : "女性" %></span>
+      </label>
+    <% end %>
+  </div>
+</div>
