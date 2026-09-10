@@ -52,4 +52,20 @@ class UserTest < ActiveSupport::TestCase
       user.destroy
     end
   end
+
+  test "defaults to chef_male avatar" do
+    user = User.new(valid_attributes)
+    assert_equal "chef_male", user.avatar_key
+  end
+
+  test "valid with chef_female avatar" do
+    user = User.new(valid_attributes.merge(avatar_key: "chef_female"))
+    assert user.valid?
+  end
+
+  test "invalid with an unknown avatar_key" do
+    user = User.new(valid_attributes.merge(avatar_key: "unknown_avatar"))
+    assert_not user.valid?
+    assert_includes user.errors[:avatar_key], "is not included in the list"
+  end
 end

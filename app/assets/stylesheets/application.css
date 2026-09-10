@@ -1015,3 +1015,50 @@ span.nav-btn {
 .gacha-result-text {
   min-height: 1.2em;
 }
+
+/* ---- ユーザーアイコン(シェフ選択) ---- */
+.avatar-icon {
+  image-rendering: pixelated;
+  vertical-align: middle;
+}
+
+.avatar-icon--small {
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+}
+
+.avatar-icon--medium {
+  width: 64px;
+  height: 64px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.avatar-choices {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+}
+
+.avatar-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+.avatar-choice:has(input:checked) {
+  border-color: var(--primary);
+  background: #fff8ef;
+}
+
+.avatar-choice__img {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+}
