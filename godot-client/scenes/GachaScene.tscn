@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://c8p3k9m2wxr71"]
+[gd_scene load_steps=10 format=3 uid="uid://c8p3k9m2wxr71"]
 
 [ext_resource type="Script" path="res://scripts/gacha_scene.gd" id="1_gacha"]
 [ext_resource type="Texture2D" path="res://assets/coins/coin.png" id="2_coin"]
@@ -7,6 +7,8 @@
 [ext_resource type="AudioStream" path="res://assets/sounds/gacha_spin.wav" id="5_spin_sound"]
 [ext_resource type="AudioStream" path="res://assets/sounds/gacha_hit.wav" id="6_hit_sound"]
 [ext_resource type="AudioStream" path="res://assets/sounds/gacha_miss.wav" id="7_miss_sound"]
+[ext_resource type="AudioStream" path="res://assets/sounds/gacha_knob_turn.wav" id="8_knob_sound"]
+[ext_resource type="AudioStream" path="res://assets/sounds/capsule_drop.wav" id="9_capsule_drop_sound"]
 
 [node name="GachaScene" type="Control"]
 layout_mode = 3
@@ -62,6 +64,32 @@ offset_right = 320.0
 offset_bottom = 380.0
 texture = ExtResource("3_machine")
 
+[node name="DomeSwirl" type="Node2D" parent="VBox/MachineArea"]
+position = Vector2(160, 164)
+
+[node name="DomeCapsule1" type="Sprite2D" parent="VBox/MachineArea/DomeSwirl"]
+[node name="DomeCapsule2" type="Sprite2D" parent="VBox/MachineArea/DomeSwirl"]
+[node name="DomeCapsule3" type="Sprite2D" parent="VBox/MachineArea/DomeSwirl"]
+[node name="DomeCapsule4" type="Sprite2D" parent="VBox/MachineArea/DomeSwirl"]
+[node name="DomeCapsule5" type="Sprite2D" parent="VBox/MachineArea/DomeSwirl"]
+[node name="DomeCapsule6" type="Sprite2D" parent="VBox/MachineArea/DomeSwirl"]
+
+[node name="KnobSprite" type="TextureRect" parent="VBox/MachineArea"]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 254.0
+offset_right = 182.0
+offset_bottom = 306.0
+visible = false
+
+[node name="CapsuleSprite" type="TextureRect" parent="VBox/MachineArea"]
+layout_mode = 0
+offset_left = 128.0
+offset_top = 190.0
+offset_right = 184.0
+offset_bottom = 246.0
+visible = false
+
 [node name="RevealHolder" type="Control" parent="VBox/MachineArea"]
 layout_mode = 0
 offset_left = 120.0
@@ -113,3 +141,9 @@ stream = ExtResource("6_hit_sound")
 
 [node name="MissSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("7_miss_sound")
+
+[node name="KnobSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_knob_sound")
+
+[node name="CapsuleDropSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_capsule_drop_sound")

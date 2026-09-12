@@ -10,3 +10,9 @@ Rails.application.config.assets.version = "1.0"
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
 # Rails.application.config.assets.precompile += %w( admin.js admin.css )
+
+# .wavは既定でmimeタイプが未登録のため、Sprocketsがガチャの効果音を
+# 解決できるように明示的に登録する。
+Rails.application.config.assets.configure do |env|
+  env.register_mime_type "audio/wav", extensions: [".wav"]
+end

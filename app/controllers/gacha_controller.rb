@@ -9,6 +9,8 @@ class GachaController < ApplicationController
         case
         when result.error == :insufficient_coins
           redirect_to profile_path, alert: "コインが足りません。"
+        when result.error == :monster_limit_reached
+          redirect_to profile_path, alert: "モンスターの所持数が上限(100体)に達しています。"
         when result.hit
           flash[:gacha_result] = { "monsters" => [ monster_payload(result.monster) ] }
           redirect_to profile_path, notice: "🎉 #{result.monster.name} を獲得しました！"
@@ -20,8 +22,8 @@ class GachaController < ApplicationController
       # JSON応答は、マイページのガチャ演出(コインが落ちる→マシンが揺れる→
       # モンスターが飛び出す)をページ遷移なしでJavaScriptから呼ぶためのもの。
       format.json do
-        if result.error == :insufficient_coins
-          render json: { error: "insufficient_coins" }, status: :unprocessable_entity
+        if result.error
+          render json: { error: result.error.to_s }, status: :unprocessable_entity
         else
           render json: {
             hit: result.hit,
@@ -40,6 +42,8 @@ class GachaController < ApplicationController
       format.html do
         if result.error == :insufficient_rainbow_coins
           redirect_to profile_path, alert: "レインボーコインが足りません。"
+        elsif result.error == :monster_limit_reached
+          redirect_to profile_path, alert: "モンスターの所持数が上限(100体)に達しています。"
         else
           hit_monsters = result.pulls.filter_map { |pull| pull[:monster] }
           hit_count = hit_monsters.size
@@ -51,8 +55,8 @@ class GachaController < ApplicationController
       end
 
       format.json do
-        if result.error == :insufficient_rainbow_coins
-          render json: { error: "insufficient_rainbow_coins" }, status: :unprocessable_entity
+        if result.error
+          render json: { error: result.error.to_s }, status: :unprocessable_entity
         else
           render json: {
             pulls: result.pulls.map { |p| { hit: p[:hit], monster: p[:monster] ? monster_payload(p[:monster]) : nil } },
