@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(bin/rails db:migrate*)",
+      "Bash(bin/rails db:reset*)",
+      "Bash(bin/rails db:drop*)",
+      "Bash(bin/rails db:rollback*)",
+      "Bash(bin/rails db:schema:load*)",
+      "Bash(bin/rails db:setup*)",
+      "Bash(bin/rails db:prepare*)",
+      "Bash(bin/rails db:purge*)",
+      "Bash(rails db:migrate*)",
+      "Bash(rails db:reset*)",
+      "Bash(rails db:drop*)",
+      "Bash(rails db:rollback*)",
+      "Bash(rails db:schema:load*)",
+      "Bash(rails db:setup*)",
+      "Bash(rails db:prepare*)",
+      "Bash(rails db:purge*)",
+      "Bash(rake db:migrate*)",
+      "Bash(rake db:reset*)",
+      "Bash(rake db:drop*)",
+      "Bash(rake db:rollback*)",
+      "Bash(rake db:schema:load*)",
+      "Bash(rake db:setup*)",
+      "Bash(rake db:prepare*)",
+      "Bash(rake db:purge*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r \".tool_input.command // empty\"); if echo \"$cmd\" | grep -qE \"db:migrate:status\"; then echo \"{}\"; elif echo \"$cmd\" | grep -qE \"\\bdb:(migrate|reset|drop|rollback|schema:load|setup|prepare|purge)\\b\"; then jq -n \"{hookSpecificOutput:{hookEventName:\\\"PreToolUse\\\",permissionDecision:\\\"deny\\\",permissionDecisionReason:\\\"DB破壊的コマンド(db:migrate/db:reset/db:drop/db:rollback/db:schema:load/db:setup/db:prepare/db:purge)はガードレールでブロックされています。実行が必要な場合はユーザー自身に直接実行してもらってください。\\\"}}\"; else echo \"{}\"; fi",
+            "statusMessage": "DB破壊的コマンドをチェック中..."
+          }
+        ]
+      }
+    ]
+  }
+}
