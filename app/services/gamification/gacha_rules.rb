@@ -8,5 +8,10 @@ module Gamification
     # user_monstersテーブルの肥大化を防ぐため、1ユーザーが保持できる
     # モンスター所持レコード数(重複所持も含む)の上限。
     MAX_OWNED_MONSTERS = 100
+
+    # GachaPullService/SevenGachaPullServiceの両方から使う共通判定。
+    def self.monster_limit_reached?(user)
+      user.user_monsters.count >= MAX_OWNED_MONSTERS
+    end
   end
 end

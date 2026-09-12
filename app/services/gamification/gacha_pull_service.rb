@@ -13,12 +13,21 @@ module Gamification
 
     def call
       return Result.new(hit: false, monster: nil, error: :insufficient_coins) if user.coins < GachaRules::COST
-      return Result.new(hit: false, monster: nil, error: :monster_limit_reached) if monster_limit_reached?
 
       monster = nil
       hit = false
+      limit_reached = false
 
       ActiveRecord::Base.transaction do
+        # 同時に複数リクエストが来ても所持数の上限判定がすり抜けないよう、
+        # ユーザー行をロックしてから判定・更新まで一貫して行う。
+        user.lock!
+
+        if GachaRules.monster_limit_reached?(user)
+          limit_reached = true
+          raise ActiveRecord::Rollback
+        end
+
         user.update!(coins: user.coins - GachaRules::COST)
         gacha_pull = GachaPull.create!(user: user, cost: GachaRules::COST, hit: false)
         CoinEvent.create!(
@@ -34,16 +43,14 @@ module Gamification
         gacha_pull.update!(hit: hit, monster: monster)
       end
 
+      return Result.new(hit: false, monster: nil, error: :monster_limit_reached) if limit_reached
+
       Result.new(hit: hit, monster: monster, error: nil)
     end
 
     private
 
     attr_reader :user
-
-    def monster_limit_reached?
-      user.user_monsters.count >= GachaRules::MAX_OWNED_MONSTERS
-    end
 
     # テストでスタブしやすいよう当落判定だけを独立したメソッドに切り出す
     def rolled_hit?
