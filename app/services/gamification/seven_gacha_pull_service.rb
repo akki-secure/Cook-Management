@@ -19,14 +19,26 @@ module Gamification
 
     def call
       return Result.new(pulls: [], error: :insufficient_rainbow_coins) if user.rainbow_coins < COST
-      return Result.new(pulls: [], error: :monster_limit_reached) if monster_limit_reached?
 
       pulls = []
+      limit_reached = false
+
       ActiveRecord::Base.transaction do
-        user.update!(rainbow_coins: user.rainbow_coins - COST)
+        # 同時に複数リクエストが来ても所持数の上限判定がすり抜けないよう、
+        # ユーザー行をロックしてから判定・更新まで一貫して行う。
+        user.lock!
         @owned_count = user.user_monsters.count
+
+        if @owned_count >= GachaRules::MAX_OWNED_MONSTERS
+          limit_reached = true
+          raise ActiveRecord::Rollback
+        end
+
+        user.update!(rainbow_coins: user.rainbow_coins - COST)
         PULL_COUNT.times { pulls << roll_one }
       end
+
+      return Result.new(pulls: [], error: :monster_limit_reached) if limit_reached
 
       Result.new(pulls: pulls, error: nil)
     end
@@ -35,25 +47,22 @@ module Gamification
 
     attr_reader :user
 
-    def monster_limit_reached?
-      user.user_monsters.count >= GachaRules::MAX_OWNED_MONSTERS
-    end
-
     def roll_one
       hit = rand < GachaRules::WIN_RATE
-      monster = nil
+      return { hit: false, monster: nil } unless hit
 
-      # 7連の途中で上限に達した場合は、以降の当たりはレコードを追加しない
-      # (所持数の肥大化を防ぐため。演出上は当たり扱いのまま見せる)。
-      if hit
-        monster = Monster.order(Arel.sql("RAND()")).first
-        if monster && @owned_count < GachaRules::MAX_OWNED_MONSTERS
-          UserMonster.create!(user: user, monster: monster, acquired_on: Date.current)
-          @owned_count += 1
-        end
+      monster = Monster.order(Arel.sql("RAND()")).first
+      return { hit: false, monster: nil } unless monster
+
+      # 7連の途中で上限に達した場合は、以降の当たりはレコードを追加せず
+      # ハズレとして扱う(所持数の肥大化を防ぎつつ、表示と実データを一致させる)。
+      if @owned_count >= GachaRules::MAX_OWNED_MONSTERS
+        return { hit: false, monster: nil }
       end
 
-      { hit: hit, monster: monster }
+      UserMonster.create!(user: user, monster: monster, acquired_on: Date.current)
+      @owned_count += 1
+      { hit: true, monster: monster }
     end
   end
 end
