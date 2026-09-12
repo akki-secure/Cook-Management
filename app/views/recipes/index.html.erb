@@ -1,17 +1,29 @@
 <h1>レシピ一覧</h1>
 
 <%= form_with url: recipes_path, method: :get, local: true, class: "filter-bar" do |f| %>
-  <%= f.text_field :q, value: params[:q], placeholder: "レシピ名・説明で検索" %>
+  <div class="field-group">
+    <%= f.label :q, "キーワード" %>
+    <%= f.text_field :q, value: params[:q], placeholder: "レシピ名・説明で検索" %>
+  </div>
 
-  <%= f.text_field :ingredients, value: params[:ingredients], placeholder: "材料で検索(スペース区切りで複数指定)" %>
+  <div class="field-group">
+    <%= f.label :ingredients, "材料" %>
+    <%= f.text_field :ingredients, value: params[:ingredients], placeholder: "材料で検索(スペース区切りで複数指定)" %>
+  </div>
 
-  <%= f.select :category_id,
-        options_for_select(@categories.map { |c| [ c.name, c.id ] }, params[:category_id]),
-        { include_blank: "すべてのカテゴリ" } %>
+  <div class="field-group">
+    <%= f.label :category_id, "カテゴリ" %>
+    <%= f.select :category_id,
+          options_for_select(@categories.map { |c| [ c.name, c.id ] }, params[:category_id]),
+          { include_blank: "すべてのカテゴリ" } %>
+  </div>
 
-  <%= f.select :tag_id,
-        options_for_select(@tags.map { |t| [ t.name, t.id ] }, params[:tag_id]),
-        { include_blank: "すべてのタグ" } %>
+  <div class="field-group">
+    <%= f.label :tag_id, "タグ" %>
+    <%= f.select :tag_id,
+          options_for_select(@tags.map { |t| [ t.name, t.id ] }, params[:tag_id]),
+          { include_blank: "すべてのタグ" } %>
+  </div>
 
   <%= f.submit "絞り込み", class: "btn" %>
   <%= link_to "リセット", recipes_path %>

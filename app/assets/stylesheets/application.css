@@ -239,6 +239,17 @@ form.button_to {
   width: auto;
 }
 
+.filter-bar .field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-bar .field-group label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
 .recipe-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
