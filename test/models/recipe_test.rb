@@ -95,6 +95,33 @@ class RecipeTest < ActiveSupport::TestCase
     assert_not_includes results, recipes(:two)
   end
 
+  test "with_ingredients matches a single ingredient" do
+    results = Recipe.with_ingredients("じゃがいも")
+    assert_includes results, recipes(:one)
+    assert_not_includes results, recipes(:two)
+  end
+
+  test "with_ingredients requires all specified ingredients (AND search)" do
+    results = Recipe.with_ingredients("卵 たまねぎ")
+    assert_includes results, recipes(:two)
+    assert_not_includes results, recipes(:one)
+  end
+
+  test "with_ingredients returns nothing when no recipe has every specified ingredient" do
+    results = Recipe.with_ingredients("じゃがいも 卵")
+    assert_empty results
+  end
+
+  test "with_ingredients splits on full-width spaces too" do
+    results = Recipe.with_ingredients("卵　たまねぎ")
+    assert_includes results, recipes(:two)
+  end
+
+  test "with_ingredients returns everything when blank" do
+    assert_equal Recipe.count, Recipe.with_ingredients(nil).count
+    assert_equal Recipe.count, Recipe.with_ingredients("").count
+  end
+
   test "average_rating returns nil when there are no ratings" do
     assert_nil recipes(:two).average_rating
   end

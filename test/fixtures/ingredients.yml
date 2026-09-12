@@ -7,3 +7,8 @@ two:
   name: 卵
   quantity: 2個
   recipe: two
+
+three:
+  name: たまねぎ
+  quantity: 1個
+  recipe: two

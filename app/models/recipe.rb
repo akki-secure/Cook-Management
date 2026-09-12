@@ -24,6 +24,21 @@ class Recipe < ApplicationRecord
   scope :in_category, ->(category_id) { where(category_id: category_id) if category_id.present? }
   scope :tagged_with, ->(tag_id) { joins(:tags).where(tags: { id: tag_id }) if tag_id.present? }
 
+  # スペース区切りで複数の材料名を受け取り、指定した材料すべてを含む
+  # レシピだけを返す(AND検索)。ingredientsをjoinすると材料数分だけ
+  # レシピが重複するため、材料ごとにEXISTSサブクエリを重ねる方式にしている。
+  scope :with_ingredients, ->(text) {
+    keywords = text.to_s.split(/[[:space:]　]+/).reject(&:blank?)
+    next all if keywords.empty?
+
+    keywords.inject(all) do |scope, keyword|
+      scope.where(
+        "EXISTS (SELECT 1 FROM ingredients WHERE ingredients.recipe_id = recipes.id AND ingredients.name LIKE :q)",
+        q: "%#{sanitize_sql_like(keyword)}%"
+      )
+    end
+  }
+
   def favorited_by?(user)
     return false unless user
     return favorites.any? { |favorite| favorite.user_id == user.id } if favorites.loaded?
