@@ -44,6 +44,20 @@ class RecipesControllerTest < ActionDispatch::IntegrationTest
     assert_not_includes @response.body, recipes(:one).title
   end
 
+  test "index filters by a single ingredient" do
+    get recipes_url, params: { ingredients: "じゃがいも" }
+    assert_response :success
+    assert_includes @response.body, recipes(:one).title
+    assert_not_includes @response.body, recipes(:two).title
+  end
+
+  test "index filters by multiple ingredients with AND logic" do
+    get recipes_url, params: { ingredients: "卵 たまねぎ" }
+    assert_response :success
+    assert_includes @response.body, recipes(:two).title
+    assert_not_includes @response.body, recipes(:one).title
+  end
+
   test "show is accessible without login" do
     get recipe_url(recipes(:one))
     assert_response :success

@@ -4,10 +4,11 @@ class RecipesController < ApplicationController
   before_action :require_owner, only: [ :edit, :update, :destroy ]
 
   def index
-    @recipes = Recipe.includes(:category, :tags, :user, :ratings, :favorites)
+    @recipes = Recipe.includes(:category, :tags, :user, :ratings, :favorites, :ingredients)
                       .search_by_keyword(params[:q])
                       .in_category(params[:category_id])
                       .tagged_with(params[:tag_id])
+                      .with_ingredients(params[:ingredients])
                       .order(created_at: :desc)
                       .distinct
     @categories = Category.order(:name)
