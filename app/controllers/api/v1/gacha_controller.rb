@@ -5,8 +5,8 @@ module Api
         @user = current_api_user
         @result = Gamification::GachaPullService.call(user: @user)
 
-        if @result.error == :insufficient_coins
-          render json: { error: "insufficient_coins" }, status: :unprocessable_entity
+        if @result.error
+          render json: { error: @result.error.to_s }, status: :unprocessable_entity
         else
           render status: :created
         end
@@ -16,8 +16,8 @@ module Api
         @user = current_api_user
         @result = Gamification::SevenGachaPullService.call(user: @user)
 
-        if @result.error == :insufficient_rainbow_coins
-          render json: { error: "insufficient_rainbow_coins" }, status: :unprocessable_entity
+        if @result.error
+          render json: { error: @result.error.to_s }, status: :unprocessable_entity
         else
           render status: :created
         end

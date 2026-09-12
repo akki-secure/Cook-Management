@@ -19,10 +19,12 @@ module Gamification
 
     def call
       return Result.new(pulls: [], error: :insufficient_rainbow_coins) if user.rainbow_coins < COST
+      return Result.new(pulls: [], error: :monster_limit_reached) if monster_limit_reached?
 
       pulls = []
       ActiveRecord::Base.transaction do
         user.update!(rainbow_coins: user.rainbow_coins - COST)
+        @owned_count = user.user_monsters.count
         PULL_COUNT.times { pulls << roll_one }
       end
 
@@ -33,13 +35,22 @@ module Gamification
 
     attr_reader :user
 
+    def monster_limit_reached?
+      user.user_monsters.count >= GachaRules::MAX_OWNED_MONSTERS
+    end
+
     def roll_one
       hit = rand < GachaRules::WIN_RATE
       monster = nil
 
+      # 7連の途中で上限に達した場合は、以降の当たりはレコードを追加しない
+      # (所持数の肥大化を防ぐため。演出上は当たり扱いのまま見せる)。
       if hit
         monster = Monster.order(Arel.sql("RAND()")).first
-        UserMonster.create!(user: user, monster: monster, acquired_on: Date.current) if monster
+        if monster && @owned_count < GachaRules::MAX_OWNED_MONSTERS
+          UserMonster.create!(user: user, monster: monster, acquired_on: Date.current)
+          @owned_count += 1
+        end
       end
 
       { hit: hit, monster: monster }

@@ -13,6 +13,7 @@ module Gamification
 
     def call
       return Result.new(hit: false, monster: nil, error: :insufficient_coins) if user.coins < GachaRules::COST
+      return Result.new(hit: false, monster: nil, error: :monster_limit_reached) if monster_limit_reached?
 
       monster = nil
       hit = false
@@ -39,6 +40,10 @@ module Gamification
     private
 
     attr_reader :user
+
+    def monster_limit_reached?
+      user.user_monsters.count >= GachaRules::MAX_OWNED_MONSTERS
+    end
 
     # テストでスタブしやすいよう当落判定だけを独立したメソッドに切り出す
     def rolled_hit?

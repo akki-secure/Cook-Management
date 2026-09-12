@@ -4,5 +4,9 @@ module Gamification
   module GachaRules
     COST = 1
     WIN_RATE = 0.5
+
+    # user_monstersテーブルの肥大化を防ぐため、1ユーザーが保持できる
+    # モンスター所持レコード数(重複所持も含む)の上限。
+    MAX_OWNED_MONSTERS = 100
   end
 end

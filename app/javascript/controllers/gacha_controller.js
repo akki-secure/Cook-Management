@@ -5,7 +5,7 @@ import { Controller } from "@hotwired/stimulus"
 // 一連の演出を、ページ遷移なしでJavaScriptから再現する。
 export default class extends Controller {
   static targets = [
-    "coinLabel", "rainbowCoinLabel", "coinSprite", "machineSprite",
+    "coinLabel", "rainbowCoinLabel", "coinSprite", "machineSprite", "knobSprite", "capsuleSprite", "domeSwirl",
     "revealHolder", "resultLabel", "pullButton", "sevenButton",
   ]
 
@@ -16,12 +16,23 @@ export default class extends Controller {
     spriteMap: Object,
     coinIcon: String,
     machineIcon: String,
+    knobFrames: Array,
+    capsuleClosedMap: Object,
+    capsuleOpenMap: Object,
+    coinSound: String,
+    knobSound: String,
+    capsuleDropSound: String,
+    hitSound: String,
+    missSound: String,
     cost: Number,
     sevenCost: Number,
   }
 
   static COIN_DROP_MS = 400
   static MACHINE_SHAKE_MS = 400
+  static KNOB_FRAME_MS = 120
+  static CAPSULE_DROP_MS = 350
+  static CAPSULE_OPEN_MS = 300
 
   connect() {
     this.coinSpriteTarget.src = this.coinIconValue
@@ -52,11 +63,13 @@ export default class extends Controller {
     this.updateButtonState()
   }
 
-  // コイン投入アニメーション → ガチャマシンが揺れる、の順に再生する。
-  // この演出はあくまで「回した」ことを伝える表現で、実際の当落判定は
-  // サーバー側(Gamification::GachaPullService / SevenGachaPullService)が担当している。
+  // コイン投入アニメーション → ガチャマシンが揺れる → レバーを回す →
+  // カプセルが落ちて開く、の順に再生する。この演出はあくまで「回した」ことを
+  // 伝える表現で、実際の当落判定はサーバー側
+  // (Gamification::GachaPullService / SevenGachaPullService)が担当している。
   playAnimation() {
     return new Promise((resolve) => {
+      this.playSound(this.coinSoundValue)
       this.coinSpriteTarget.classList.remove("dropping")
       void this.coinSpriteTarget.offsetWidth // アニメーションを毎回頭から再生させるための強制リフロー
       this.coinSpriteTarget.classList.add("dropping")
@@ -66,9 +79,72 @@ export default class extends Controller {
         void this.machineSpriteTarget.offsetWidth
         this.machineSpriteTarget.classList.add("shaking")
 
-        setTimeout(resolve, this.constructor.MACHINE_SHAKE_MS)
+        setTimeout(() => {
+          this.playKnobTurn().then(() => this.playCapsuleStage()).then(resolve)
+        }, this.constructor.MACHINE_SHAKE_MS)
       }, this.constructor.COIN_DROP_MS)
     })
+  }
+
+  // レバーを4コマ差し替えて回転を表現する。ドーム内のカプセルも
+  // レバーを回している間だけ連動してくるくる回す。
+  playKnobTurn() {
+    return new Promise((resolve) => {
+      this.playSound(this.knobSoundValue)
+      this.knobSpriteTarget.classList.add("visible")
+      this.domeSwirlTarget.classList.remove("spinning")
+      void this.domeSwirlTarget.offsetWidth
+      this.domeSwirlTarget.classList.add("spinning")
+      let frame = 0
+      const step = () => {
+        this.knobSpriteTarget.src = this.knobFramesValue[frame]
+        frame += 1
+        if (frame < this.knobFramesValue.length) {
+          setTimeout(step, this.constructor.KNOB_FRAME_MS)
+        } else {
+          setTimeout(() => {
+            this.knobSpriteTarget.classList.remove("visible")
+            this.domeSwirlTarget.classList.remove("spinning")
+            resolve()
+          }, this.constructor.KNOB_FRAME_MS)
+        }
+      }
+      step()
+    })
+  }
+
+  // ランダムな色のカプセルが落ちてきて、少し間を置いてから開く。
+  // 色は結果モンスターのrarityとは無関係な、見た目だけのランダム演出。
+  playCapsuleStage() {
+    return new Promise((resolve) => {
+      const color = this.pickCapsuleColor()
+      this.capsuleSpriteTarget.src = this.capsuleClosedMapValue[color]
+      this.capsuleSpriteTarget.classList.remove("dropped", "opened")
+      void this.capsuleSpriteTarget.offsetWidth
+      this.capsuleSpriteTarget.classList.add("visible", "dropped")
+      this.playSound(this.capsuleDropSoundValue)
+
+      setTimeout(() => {
+        this.capsuleSpriteTarget.src = this.capsuleOpenMapValue[color]
+        this.capsuleSpriteTarget.classList.add("opened")
+
+        setTimeout(() => {
+          this.capsuleSpriteTarget.classList.remove("visible", "dropped", "opened")
+          resolve()
+        }, this.constructor.CAPSULE_OPEN_MS)
+      }, this.constructor.CAPSULE_DROP_MS)
+    })
+  }
+
+  pickCapsuleColor() {
+    const colors = Object.keys(this.capsuleClosedMapValue)
+    return colors[Math.floor(Math.random() * colors.length)]
+  }
+
+  // 自動再生制限等で失敗しても演出自体は止めない
+  playSound(url) {
+    if (!url) return
+    new Audio(url).play().catch(() => {})
   }
 
   async requestPull(url) {
@@ -92,6 +168,8 @@ export default class extends Controller {
         this.resultLabelTarget.textContent = "コインが足りません。"
       } else if (data.error === "insufficient_rainbow_coins") {
         this.resultLabelTarget.textContent = "レインボーコインが足りません。"
+      } else if (data.error === "monster_limit_reached") {
+        this.resultLabelTarget.textContent = "モンスターの所持数が上限(100体)に達しています。"
       } else {
         this.resultLabelTarget.textContent = "通信エラーが発生しました。"
       }
@@ -112,8 +190,10 @@ export default class extends Controller {
     if (data.hit && data.monster) {
       this.resultLabelTarget.textContent = `🎉 ${data.monster.name} を獲得しました！`
       this.revealMonster(data.monster)
+      this.playSound(this.hitSoundValue)
     } else {
       this.resultLabelTarget.textContent = "ハズレでした…また挑戦してください。"
+      this.playSound(this.missSoundValue)
     }
   }
 
@@ -122,8 +202,10 @@ export default class extends Controller {
     if (hits.length > 0) {
       this.resultLabelTarget.textContent = `🌈 7連ガチャで${hits.length}体獲得！`
       hits.forEach((pull) => this.revealMonster(pull.monster))
+      this.playSound(this.hitSoundValue)
     } else {
       this.resultLabelTarget.textContent = "🌈 7連ガチャ…残念、今回は全てハズレでした。"
+      this.playSound(this.missSoundValue)
     }
   }
 

@@ -15,6 +15,14 @@
      data-gacha-sprite-map-value="<%= Monster.pluck(:sprite_key).index_with { |k| image_path("monsters/#{k}") }.to_json %>"
      data-gacha-coin-icon-value="<%= image_path('coins/coin.png') %>"
      data-gacha-machine-icon-value="<%= image_path('gacha_machine.png') %>"
+     data-gacha-knob-frames-value="<%= (1..4).map { |i| image_path("gacha/gacha_knob_turn_#{i}.png") }.to_json %>"
+     data-gacha-capsule-closed-map-value="<%= %w[blue green pink purple red yellow].index_with { |c| image_path("gacha/capsule_#{c}.png") }.to_json %>"
+     data-gacha-capsule-open-map-value="<%= %w[blue green pink purple red yellow].index_with { |c| image_path("gacha/capsule_open_#{c}.png") }.to_json %>"
+     data-gacha-coin-sound-value="<%= asset_path('coin_drop.wav') %>"
+     data-gacha-knob-sound-value="<%= asset_path('gacha_knob_turn.wav') %>"
+     data-gacha-capsule-drop-sound-value="<%= asset_path('capsule_drop.wav') %>"
+     data-gacha-hit-sound-value="<%= asset_path('gacha_hit.wav') %>"
+     data-gacha-miss-sound-value="<%= asset_path('gacha_miss.wav') %>"
      data-gacha-cost-value="<%= Gamification::GachaRules::COST %>"
      data-gacha-seven-cost-value="<%= Gamification::SevenGachaPullService::COST %>">
   <h2>料理人ステータス</h2>
@@ -31,7 +39,14 @@
 
   <div class="gacha-machine-area">
     <img data-gacha-target="coinSprite" class="gacha-coin-sprite" alt="">
+    <img data-gacha-target="knobSprite" class="gacha-knob-sprite" alt="">
+    <img data-gacha-target="capsuleSprite" class="gacha-capsule-sprite" alt="">
     <img data-gacha-target="machineSprite" class="gacha-machine-sprite" alt="ガチャマシン">
+    <div data-gacha-target="domeSwirl" class="gacha-dome-swirl" aria-hidden="true">
+      <% %w[red blue yellow green purple pink].each_with_index do |color, i| %>
+        <img class="gacha-dome-capsule gacha-dome-capsule--<%= i + 1 %>" src="<%= image_path("gacha/capsule_#{color}.png") %>" alt="">
+      <% end %>
+    </div>
   </div>
   <div class="gacha-reveal" data-gacha-target="revealHolder"></div>
   <p class="gacha-result-text" data-gacha-target="resultLabel"></p>
