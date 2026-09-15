@@ -6,4 +6,3 @@ json.current_streak_days @user.current_streak_days
 json.longest_streak_days @user.longest_streak_days
 json.coins @user.coins
 json.rainbow_coins @user.rainbow_coins
-json.avatar_key @user.avatar_key

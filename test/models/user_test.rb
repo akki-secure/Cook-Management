@@ -53,19 +53,16 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "defaults to chef_male avatar" do
+  test "has no avatar image attached by default" do
     user = User.new(valid_attributes)
-    assert_equal "chef_male", user.avatar_key
+    assert_not user.avatar_image.attached?
   end
 
-  test "valid with chef_female avatar" do
-    user = User.new(valid_attributes.merge(avatar_key: "chef_female"))
-    assert user.valid?
-  end
-
-  test "invalid with an unknown avatar_key" do
-    user = User.new(valid_attributes.merge(avatar_key: "unknown_avatar"))
-    assert_not user.valid?
-    assert_includes user.errors[:avatar_key], "is not included in the list"
+  test "can have an avatar image attached" do
+    user = User.create!(valid_attributes)
+    File.open(Rails.root.join("test/fixtures/files/test_image.png")) do |file|
+      user.avatar_image.attach(io: file, filename: "test_image.png", content_type: "image/png")
+    end
+    assert user.avatar_image.attached?
   end
 end
