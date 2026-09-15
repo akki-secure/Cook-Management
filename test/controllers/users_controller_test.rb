@@ -34,13 +34,15 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "create accepts a chosen avatar_key" do
+  test "create accepts an uploaded avatar image" do
+    image = fixture_file_upload("test_image.png", "image/png")
+
     assert_difference "User.count", 1 do
-      post signup_url, params: { user: valid_params[:user].merge(avatar_key: "chef_female") }
+      post signup_url, params: { user: valid_params[:user].merge(avatar_image: image) }
     end
 
     user = User.order(:created_at).last
-    assert_equal "chef_female", user.avatar_key
+    assert user.avatar_image.attached?
   end
 
   test "show requires login" do
@@ -112,12 +114,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "update changes avatar_key" do
+  test "update changes the avatar image" do
     sign_in_as(users(:one))
+    image = fixture_file_upload("test_image.png", "image/png")
 
-    patch profile_url, params: { user: { name: users(:one).name, email: users(:one).email, avatar_key: "chef_female", password: "", password_confirmation: "" } }
+    patch profile_url, params: { user: { name: users(:one).name, email: users(:one).email, avatar_image: image, password: "", password_confirmation: "" } }
 
     assert_redirected_to profile_url
-    assert_equal "chef_female", users(:one).reload.avatar_key
+    assert users(:one).reload.avatar_image.attached?
   end
 end

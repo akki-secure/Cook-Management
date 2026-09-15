@@ -16,4 +16,14 @@ module ApplicationHelper
       { label: "新規登録", url: signup_path }
     ]
   end
+
+  # ヘッダーとマイページの両方から呼ばれる、ユーザーアイコン表示の唯一の定義元。
+  # 画像未添付の場合はユーザー名の頭文字を使った円形プレースホルダーを表示する。
+  def avatar_tag(user, size:)
+    if user.avatar_image.attached?
+      image_tag user.avatar_image, alt: "", class: "avatar-icon avatar-icon--#{size}"
+    else
+      content_tag :div, user.name.first, class: "avatar-placeholder avatar-placeholder--#{size}"
+    end
+  end
 end
