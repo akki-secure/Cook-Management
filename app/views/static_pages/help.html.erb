@@ -11,7 +11,7 @@
         <div class="container">
           <span class="logo"><span class="help-badge">1</span>レシピ管理</span>
           <nav>
-            <span>使い方(今のページ)</span>
+            <span>使い方</span>
             <% @logged_in_items.each do |item| %>
               <span><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></span>
             <% end %>
@@ -50,7 +50,7 @@
         <div class="container">
           <span class="logo">レシピ管理</span>
           <nav>
-            <span>使い方(今のページ)</span>
+            <span>使い方</span>
             <% @logged_out_items.each do |item| %>
               <span><span class="help-badge"><%= item[:badge] %></span><%= item[:label] %></span>
             <% end %>

@@ -14,8 +14,6 @@
 .help-mockup__replica {
   border: 1px dashed #e8d3ae;
   border-radius: 8px;
-  overflow-x: auto;
-  overflow-y: hidden;
   user-select: none;
 }
 
@@ -24,13 +22,17 @@
 }
 
 .help-mockup__replica .site-header .container {
-  width: max-content;
-  min-width: 100%;
+  height: auto;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .help-mockup__replica nav {
-  flex-wrap: nowrap;
-  white-space: nowrap;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  white-space: normal;
 }
 
 .help-mockup__replica nav span:not(.help-badge) {
