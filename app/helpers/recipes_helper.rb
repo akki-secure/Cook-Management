@@ -5,7 +5,7 @@ module RecipesHelper
     params = {
       text: recipe.title,
       url: recipe_url(recipe),
-      hashtags: "cook"
+      hashtags: "料理"
     }
     "https://twitter.com/intent/tweet?#{params.to_query}"
   end
