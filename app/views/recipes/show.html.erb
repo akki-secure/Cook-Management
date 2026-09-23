@@ -1,3 +1,8 @@
+<% content_for :title, @recipe.title %>
+<% content_for :og_title, @recipe.title %>
+<% content_for :og_description, @recipe.description.presence || "#{@recipe.title}のレシピ" %>
+<% content_for :og_image, rails_blob_url(@recipe.image, host: request.base_url) if @recipe.image.attached? %>
+
 <div class="recipe-header">
   <% if @recipe.image.attached? %>
     <%= image_tag @recipe.image %>
