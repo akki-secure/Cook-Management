@@ -7,6 +7,7 @@
      data-gacha-csrf-value="<%= form_authenticity_token %>"
      data-gacha-sprite-map-value="<%= Monster.pluck(:sprite_key).index_with { |k| image_path("monsters/#{k}") }.to_json %>"
      data-gacha-coin-icon-value="<%= image_path('coins/coin.png') %>"
+     data-gacha-rainbow-coin-icon-value="<%= image_path('coins/rainbow_coin.png') %>"
      data-gacha-machine-icon-value="<%= image_path('gacha_machine.png') %>"
      data-gacha-knob-frames-value="<%= (1..4).map { |i| image_path("gacha/gacha_knob_turn_#{i}.png") }.to_json %>"
      data-gacha-capsule-closed-map-value="<%= %w[blue green pink purple red yellow].index_with { |c| image_path("gacha/capsule_#{c}.png") }.to_json %>"

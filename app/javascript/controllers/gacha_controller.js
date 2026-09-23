@@ -14,6 +14,7 @@ export default class extends Controller {
     csrf: String,
     spriteMap: Object,
     coinIcon: String,
+    rainbowCoinIcon: String,
     machineIcon: String,
     knobFrames: Array,
     capsuleClosedMap: Object,
@@ -40,16 +41,17 @@ export default class extends Controller {
   }
 
   pull() {
-    this.run(this.pullUrlValue)
+    this.run(this.pullUrlValue, this.coinIconValue)
   }
 
   pullSeven() {
-    this.run(this.sevenUrlValue)
+    this.run(this.sevenUrlValue, this.rainbowCoinIconValue)
   }
 
-  async run(url) {
+  async run(url, coinIcon) {
     if (this.isPulling) return
     this.isPulling = true
+    this.coinSpriteTarget.src = coinIcon
     this.pullButtonTarget.disabled = true
     this.sevenButtonTarget.disabled = true
     this.resultLabelTarget.textContent = ""
