@@ -6,6 +6,8 @@ module ApplicationHelper
     [
       { label: "新規レシピ", url: new_recipe_path },
       { label: "マイページ", url: profile_path },
+      { label: "ガチャ", url: gacha_path },
+      { label: "対戦", url: battle_path },
       { label: "モンスター図鑑", url: monsters_path }
     ]
   end

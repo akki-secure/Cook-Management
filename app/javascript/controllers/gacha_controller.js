@@ -1,8 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// マイページのガチャ演出。Godotクライアント(gacha_scene.gd)と同じ
-// 「コインが落ちる → ガチャマシンが揺れる → モンスターが飛び出す」という
-// 一連の演出を、ページ遷移なしでJavaScriptから再現する。
+// ガチャページの演出。「コインが落ちる → ガチャマシンが揺れる →
+// モンスターが飛び出す」という一連の流れを、ページ遷移なしで再現する。
 export default class extends Controller {
   static targets = [
     "coinLabel", "rainbowCoinLabel", "coinSprite", "machineSprite", "knobSprite", "capsuleSprite", "domeSwirl",

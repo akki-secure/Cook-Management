@@ -16,9 +16,9 @@
 - **評価(★5段階)**: レシピを1〜5の星で評価。1人1レシピにつき1件、後から変更可。平均評価を一覧・詳細に表示
 - **ユーザー認証**: メールアドレス・パスワードでの新規登録/ログイン(セッションベース、Devise等は未使用)
 - **ゲーミフィケーション**: 写真付きレシピの新規投稿でEXP・料理コインを獲得。EXPでレベル(1〜100)が上がり、レベルに応じて称号が変化。ログイン・投稿による連続記録(ストリーク)ボーナスもあり
-- **ガチャ**: 料理コインを消費してガチャを回し、当たれば料理モンスターを1体獲得(ハズレもある)。マイページから、または後述のGodotクライアントから実行可能
+- **ガチャ**: 料理コインを消費してガチャを回し、当たれば料理モンスターを1体獲得(ハズレもある)。ヘッダーの「ガチャ」ページから実行可能
 - **モンスター図鑑**: 獲得した料理モンスターを一覧・詳細で確認できる図鑑ページ。未所持のモンスターはシルエット表示になり、イラストは常時アニメーション(バウンス・スイング・跳躍等)する。マイページの本アイコンボタン、またはヘッダーの「モンスター図鑑」リンクから開ける
-- **Godotクライアント連携**: `godot-client/`に同梱のGodot 4製デスクトップアプリから、レベル・EXP・称号・所持コイン・獲得モンスターの確認とガチャの実行ができる(`/api/v1`のトークン認証付きJSON APIで通信)
+- **X(旧Twitter)共有**: レシピ詳細ページから、タイトル・URL・`#cook`ハッシュタグ付きでXにシェアできる
 
 ## 技術スタック
 
@@ -26,9 +26,7 @@
 - MySQL 8.0
 - Turbo / Stimulus(importmap、JSビルド不要)
 - Active Storage(画像アップロード)
-- Jbuilder(`/api/v1`のJSONレスポンス生成)
 - Minitest(テスト)
-- Godot 4.7(`godot-client/`、GDScript製の連携クライアント。任意)
 
 ## 画面遷移図
 
@@ -46,29 +44,28 @@ flowchart TD
     ResetNew -.->|メール内リンク| ResetEdit["新パスワード設定\n/password_resets/:token/edit"]
     ResetEdit -->|再設定成功| Login
 
-    Index -->|詳細を見る| Show["レシピ詳細\n/recipes/:id\n(♥お気に入り・コメント・★評価)"]
+    Index -->|詳細を見る| Show["レシピ詳細\n/recipes/:id\n(♥お気に入り・コメント・★評価・Xで共有)"]
 
     Index -->|ログイン済み| New["レシピ作成\n/recipes/new"]
     New -->|保存、写真付きならEXP・コイン付与| Show
     Show -->|投稿者本人のみ| Edit["レシピ編集\n/recipes/:id/edit"]
     Edit -->|更新| Show
 
-    Index -->|ログイン済み| Profile["マイページ\n/profile\n投稿レシピ一覧・レベル/EXP/称号/コイン/獲得モンスター\nガチャを回すボタン(POST /gacha)あり"]
+    Index -->|ログイン済み| Profile["マイページ\n/profile\n投稿レシピ一覧・レベル/EXP/称号"]
     Profile --> ProfileEdit["プロフィール編集\n/profile/edit"]
     ProfileEdit -->|名前・メール・パスワード更新| Profile
     Profile -->|ログアウト| Login
 
-    Profile -->|本アイコンボタン| ZukanIndex
+    Index -->|"ヘッダー「ガチャ」(ログイン済み)"| GachaPage["ガチャ\n/gacha\n所持コイン表示・ガチャを回す(POST /gacha)"]
+    Index -->|"ヘッダー「対戦」(ログイン済み)"| BattlePage["対戦\n/battle"]
+
     Index -->|"ヘッダー「モンスター図鑑」(ログイン済み)"| ZukanIndex["モンスター図鑑(一覧)\n/monsters\n全モンスターをNo.順にグリッド表示\n未所持はシルエット+？？？"]
     ZukanIndex -->|モンスターアイコンをクリック| ZukanShow["モンスター詳細\n/monsters/:id\nNo./種別タグ/説明文\n常時アニメーションするイラスト"]
     ZukanShow -->|前へ/次へ| ZukanShow
     ZukanShow -->|一覧へ戻る| ZukanIndex
-
-    Godot["Godotクライアント\n(godot-client/、任意)"] -.->|POST /api/v1/auth| Profile
-    Godot -.->|GET /api/v1/status, /api/v1/monsters\nPOST /api/v1/gacha| Profile
 ```
 
-未ログイン状態では一覧・詳細の閲覧のみ可能。レシピ作成・編集、マイページ、お気に入り・コメント・評価、モンスター図鑑はログインが必須で、`require_login` により未ログイン時は `/login` にリダイレクトされる。お気に入り登録・コメント投稿・★評価はレシピ詳細画面内での操作(Turbo Streamによる部分更新)であり、画面遷移は発生しない。パスワード再設定は、申請フォーム送信後にメールで送られるリンク(トークン付き、有効期限30分)経由で新パスワード設定画面に遷移する(破線の矢印)。もう一方の破線(Godotクライアント→マイページ)は画面遷移ではなく、`/api/v1`経由のAPI通信(セッションではなくトークン認証)であることを示している。
+未ログイン状態では一覧・詳細の閲覧のみ可能。レシピ作成・編集、マイページ、お気に入り・コメント・評価、ガチャ、対戦、モンスター図鑑はログインが必須で、`require_login` により未ログイン時は `/login` にリダイレクトされる。お気に入り登録・コメント投稿・★評価はレシピ詳細画面内での操作(Turbo Streamによる部分更新)であり、画面遷移は発生しない。Xへの共有はレシピ詳細画面から外部サイト(twitter.com)への遷移のため、アプリ内の画面遷移図には含めていない。パスワード再設定は、申請フォーム送信後にメールで送られるリンク(トークン付き、有効期限30分)経由で新パスワード設定画面に遷移する(破線の矢印)。
 
 ## ER図
 
@@ -120,7 +117,7 @@ erDiagram
         bigint id PK
         string name
         integer rarity "デフォルト0"
-        string sprite_key "Godot側の表示キー、例: color:red;shape:circle"
+        string sprite_key "表示用画像のファイル名、例: egg_character.png"
         text description
         integer unlock_min_level "デフォルト1、ガチャで出現し得る最低レベル"
     }
@@ -319,9 +316,7 @@ erDiagram
 npx @redocly/cli preview-docs docs/api/openapi.yaml
 ```
 
-このアプリの大部分はJSON APIではなくセッションベースのHTMLアプリのため、各エンドポイントのレスポンスは基本的に302リダイレクト or HTMLレンダリング(一部Turbo Streamに対応)。仕様書はフォームのパラメータとレスポンスの挙動を明文化する目的で作成している。
-
-一方、`/api/v1/*`(`api_v1`タグ)のみはGodotクライアント向けのJSON APIで、セッションではなく`POST /api/v1/auth`で発行するAPIトークン(`Authorization: Bearer <token>`ヘッダー)で認証する。ガチャの抽選ロジック自体は`Gamification::GachaPullService`に一元化されており、セッションベースの`POST /gacha`(マイページ用)とトークンベースの`POST /api/v1/gacha`(Godotクライアント用)はどちらも同じロジックを呼び出している。
+このアプリはJSON APIではなくセッションベースのHTMLアプリのため、各エンドポイントのレスポンスは基本的に302リダイレクト or HTMLレンダリング(一部Turbo Streamに対応)。仕様書はフォームのパラメータとレスポンスの挙動を明文化する目的で作成している。
 
 ## セットアップ
 
@@ -360,21 +355,6 @@ bin/rails server
 ```
 
 `http://localhost:3000` でアクセスできます。
-
-## Godotクライアント(任意)
-
-`godot-client/`に、レベル・EXP・称号・所持コイン・獲得モンスターの確認とガチャの実行ができるGodot 4製のデスクトップアプリを同梱している。Railsサーバー(`bin/rails server`)が起動していることが前提。
-
-1. [Godot 4.7](https://godotengine.org/)をインストールする
-2. Godotのプロジェクトマネージャーで「読み込み」から`godot-client/project.godot`を選択して開く
-3. エディタ右上の再生ボタン(▶)を押す
-4. ログイン画面で、Rails側に登録済みのメールアドレス・パスワードを入力してログインする(新規登録はWeb側の`/signup`から行う。Godot側にはアカウント作成機能はない)
-5. ログイン後、レベル/EXP/称号/所持コイン/獲得モンスターが表示され、「ガチャを回しに行く」ボタンからガチャ画面(コイン投入・演出・効果音付き)に遷移できる
-6. 「モンスター図鑑」ボタンから図鑑一覧に遷移できる。全モンスターをNo.順に表示し、未所持はシルエット+「？？？」になる。アイコンをタップすると詳細画面(No./種別タグ/名前/説明文、常時ループするアニメーション)が開き、「＜」「＞」で前後のモンスターに移動できる(先頭・末尾では該当ボタンがdisabledになる)
-
-接続先のRails APIサーバーは`godot-client/scripts/api_client.gd`の`BASE_URL`定数(デフォルト`http://localhost:3000/api/v1`)で変更できる。
-
-Web版と同様、図鑑一覧・詳細は`GET /api/v1/monsters/book`(所持有無に関わらず全モンスターを`owned`フラグ付きで返す、既存の`GET /api/v1/monsters`は所持モンスターのみを返す仕様のまま変更していない)を利用する。一覧→詳細のシーン遷移(`change_scene_to_file`はコンストラクタ引数を渡せない)には、取得したモンスター一覧と選択中のインデックスを保持するAutoload `MonsterBookState`(`godot-client/scripts/monster_book_state.gd`)を新設して使っている。アニメーションはWeb版CSSの6種(bounce/sway/hop/jiggle/spinhop/floaty)を`Tween`で再現しており、回転を伴うspinhopは`icon.pivot_offset`を中心に設定してから回転させている(足元を軸のままにすると、Web版のCSS実装で実際に発生した「回転時にキャラクターが名前テキストへはみ出す」不具合と同じ現象が起きるため)。
 
 ## テストの実行
 
