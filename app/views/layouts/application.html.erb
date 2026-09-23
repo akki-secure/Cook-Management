@@ -1,10 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>レシピ管理</title>
+    <title><%= content_for(:title) || "レシピ管理" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <%# X(Twitter)やLINE等にURLを貼った時、タイトル・説明・画像付きのカードを表示させるためのOGPタグ。
+        各ページはcontent_forでog_title/og_description/og_imageを上書きできる。未指定時はアプリ全体のデフォルトを使う。 %>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="レシピ管理">
+    <meta property="og:url" content="<%= request.original_url %>">
+    <meta property="og:title" content="<%= content_for(:og_title) || "レシピ管理" %>">
+    <meta property="og:description" content="<%= content_for(:og_description) || "自分の作ったレシピを登録・共有できるレシピ管理アプリです。" %>">
+    <% if content_for?(:og_image) %>
+      <meta property="og:image" content="<%= content_for(:og_image) %>">
+    <% end %>
+    <meta name="twitter:card" content="<%= content_for?(:og_image) ? "summary_large_image" : "summary" %>">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>

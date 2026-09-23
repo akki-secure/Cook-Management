@@ -63,6 +63,29 @@ class RecipesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "show sets OGP tags from the recipe" do
+    recipe = recipes(:one)
+    get recipe_url(recipe)
+
+    assert_select "meta[property='og:title']" do |elements|
+      assert_equal recipe.title, elements.first["content"]
+    end
+    assert_select "meta[property='og:url']" do |elements|
+      assert_equal recipe_url(recipe), elements.first["content"]
+    end
+  end
+
+  test "show falls back to the app default OGP description when the recipe has none" do
+    recipe = recipes(:one)
+    recipe.update!(description: nil)
+
+    get recipe_url(recipe)
+
+    assert_select "meta[property='og:description']" do |elements|
+      assert_equal "#{recipe.title}のレシピ", elements.first["content"]
+    end
+  end
+
   test "new redirects to login when not logged in" do
     get new_recipe_url
     assert_redirected_to login_url
