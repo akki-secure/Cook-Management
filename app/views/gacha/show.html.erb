@@ -20,6 +20,11 @@
      data-gacha-seven-cost-value="<%= Gamification::SevenGachaPullService::COST %>">
   <p><strong>所持コイン:</strong> <span data-gacha-target="coinLabel"><%= current_user.coins %></span>枚</p>
   <p><strong>所持レインボーコイン:</strong> <span data-gacha-target="rainbowCoinLabel"><%= current_user.rainbow_coins %></span>枚</p>
+  <p>
+    <strong>所持モンスター数(上限<%= Gamification::GachaRules::MAX_OWNED_MONSTERS %>体):</strong>
+    <%= current_user.user_monsters.count %> / <%= Gamification::GachaRules::MAX_OWNED_MONSTERS %>
+    <%= link_to "モンスターを逃がす", user_monsters_path %>
+  </p>
 
   <div class="gacha-machine-area">
     <img data-gacha-target="coinSprite" class="gacha-coin-sprite" alt="">

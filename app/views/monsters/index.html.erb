@@ -2,6 +2,7 @@
 <p class="page-lead">レシピを記録してガチャを回すと、新しいモンスターに出会えます。</p>
 
 <div class="zukan-counter">所持数 <%= @owned_monster_ids.size %> / 全<%= @monsters.size %>体</div>
+<p><%= link_to "モンスターを逃がす", user_monsters_path %></p>
 
 <div class="zukan-grid">
   <% @monsters.each_with_index do |monster, index| %>

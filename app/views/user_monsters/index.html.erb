@@ -1,0 +1,28 @@
+<h1>モンスターを逃がす</h1>
+<p class="page-lead">所持数が上限に近づいたら、ここから逃がすモンスターを選べます。一度逃がすと元に戻せません。</p>
+
+<div class="zukan-counter">所持モンスター数(上限<%= Gamification::GachaRules::MAX_OWNED_MONSTERS %>体) <%= @owned_monsters.size %> / <%= Gamification::GachaRules::MAX_OWNED_MONSTERS %></div>
+
+<% if @owned_monsters.empty? %>
+  <p>逃がせるモンスターがいません。</p>
+<% else %>
+  <%= form_with url: user_monsters_path, method: :delete,
+        data: { turbo_confirm: "選択したモンスターを逃がします。よろしいですか？(元に戻せません)" } do |f| %>
+    <div class="zukan-grid">
+      <% @owned_monsters.each do |monster| %>
+        <label class="mon-tile release-tile">
+          <%= check_box_tag "ids[]", monster[:id], false, class: "release-tile__checkbox" %>
+          <div class="tile-stage">
+            <%= image_tag "monsters/#{monster[:sprite_key]}", alt: monster[:name] %>
+          </div>
+          <div class="tile-name"><%= monster[:name] %></div>
+          <div class="tile-no">獲得日: <%= monster[:acquired_on] %></div>
+        </label>
+      <% end %>
+    </div>
+
+    <%= f.submit "選択したモンスターを逃がす", class: "btn btn-danger" %>
+  <% end %>
+<% end %>
+
+<p><%= link_to "モンスター図鑑に戻る", monsters_path %></p>
