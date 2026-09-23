@@ -195,7 +195,9 @@ textarea { min-height: 120px; }
 }
 
 .btn.btn-secondary {
-  background: #999;
+  background: #fff;
+  color: var(--primary);
+  border: 1px solid var(--primary);
 }
 
 .btn.btn-danger {
@@ -204,6 +206,18 @@ textarea { min-height: 120px; }
 
 .btn.btn-add {
   background: #3f9e6e;
+}
+
+.btn.btn-x-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #000;
+}
+
+.btn-x-share__icon {
+  width: 14px;
+  height: 14px;
 }
 
 .btn:disabled {
