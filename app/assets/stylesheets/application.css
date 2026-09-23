@@ -941,16 +941,62 @@ span.nav-btn {
   top: 20px;
 }
 
-/* 位置(top/left)はCSSのkeyframesではなく battle_controller.js が敵/自分の
+/* 位置(top/left)はCSSのkeyframesではなく battle_controller.js が攻撃側/防御側の
    プラットフォームの実際の座標から計算してWeb Animations APIで動かす。
-   ここでは形と初期状態だけ決めておく。 */
+   ここでは4種類(炎/氷/衝撃波/光線)の形と模様だけ決めておく。色は
+   battle_controller.jsがモンスターのtype_labelごとに--projectile-colorとして
+   セットする(炎/氷/衝撃波/光線というカテゴリ内でも、モンスターによって色味を変える)。*/
 .battle-projectile {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
   top: 0;
   left: 0;
+  --projectile-color: #cccccc;
+}
+
+.battle-projectile--fire {
+  width: 20px;
+  height: 20px;
+  border-radius: 50% 50% 50% 0;
+  background: radial-gradient(circle at 35% 35%, #fff3c4, var(--projectile-color) 70%);
+  box-shadow: 0 0 10px var(--projectile-color);
+  animation: battle-flicker 0.15s infinite alternate;
+}
+
+.battle-projectile--ice {
+  width: 14px;
+  height: 26px;
+  background: linear-gradient(to bottom, #eafcff, var(--projectile-color));
+  clip-path: polygon(50% 0%, 100% 30%, 70% 100%, 30% 100%, 0% 30%);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.battle-projectile--shockwave {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 4px solid var(--projectile-color);
+  background: transparent;
+  animation: battle-shock-expand 0.4s infinite;
+}
+
+.battle-projectile--beam {
+  width: 40px;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--projectile-color), #ffffff);
+  box-shadow: 0 0 8px var(--projectile-color);
+  transform: rotate(var(--projectile-angle, 0deg));
+  transform-origin: center;
+}
+
+@keyframes battle-flicker {
+  from { transform: scale(1); opacity: 1; }
+  to { transform: scale(0.85); opacity: 0.85; }
+}
+
+@keyframes battle-shock-expand {
+  from { transform: scale(0.9); opacity: 1; }
+  to { transform: scale(1.5); opacity: 0.3; }
 }
 
 .battle-hud-row {

@@ -27,6 +27,15 @@ export default class extends Controller {
     "やさい": "#59bf59", "なつのあじ": "#4cd9d9", "おつまみ": "#997f4d",
   }
 
+  // type_labelから攻撃の見た目(炎/氷/衝撃波/光線)を決める。Monsterモデルに
+  // 属性カラムは無いため、既存の食べ物カテゴリを流用している。
+  static ATTACK_KIND_BY_TYPE = {
+    "がっつり": "fire", "めん類": "fire",
+    "ドリンク": "ice", "やさい": "ice", "なつのあじ": "ice",
+    "スイーツ": "shockwave", "デザート": "shockwave",
+    "たまご": "beam", "おつまみ": "beam",
+  }
+
   static BOSS_STAGE_THRESHOLDS = [0.75, 0.50, 0.25]
   static BOSS_ATTACK_MULTIPLIER = 1.25
   static FIREBALL_TRAVEL_MS = 1000
@@ -172,6 +181,13 @@ export default class extends Controller {
     if (this.turn !== "player" || this.gameOver) return
     this.attackButtonTarget.disabled = true
 
+    this.launchProjectile("player", this.playerStats.typeLabel, this.constructor.FIREBALL_TRAVEL_MS)
+    setTimeout(() => this.resolvePlayerAttack(), this.constructor.FIREBALL_TRAVEL_MS)
+  }
+
+  resolvePlayerAttack() {
+    this.projectileTarget.hidden = true
+
     const dmg = this.playerStats.attack
     this.enemyStats.hp = Math.max(0, this.enemyStats.hp - dmg)
     this.shake(this.enemyIconTarget)
@@ -196,34 +212,51 @@ export default class extends Controller {
     this.guardButtonTarget.disabled = false
     this.turnLabelTarget.textContent = `${this.enemyStats.name} のターン！`
 
-    const color = this.constructor.TYPE_EFFECT[this.enemyStats.typeLabel] || "#cccccc"
-    this.projectileTarget.style.background = color
-    this.projectileTarget.hidden = false
+    this.launchProjectile("enemy", this.enemyStats.typeLabel, this.constructor.FIREBALL_TRAVEL_MS)
 
-    // 敵(右上)プラットフォームの位置から自分(左下)プラットフォームの位置へ、
-    // 実際のDOM座標を使って斜めに飛ばす。Godot版の「敵側の少し内側から
-    // 発射し、自分側の足元近くに着弾する」という狙いを踏襲している。
+    this.impactAt = Date.now() + this.constructor.FIREBALL_TRAVEL_MS
+    this.enemyTurnTimer = setTimeout(() => this.resolveEnemyAttack(), this.constructor.FIREBALL_TRAVEL_MS)
+  }
+
+  // 攻撃側(player/enemy)のtype_labelから見た目(炎/氷/衝撃波/光線)と音を決めて、
+  // 攻撃側プラットフォーム→防御側プラットフォームへ.battle-projectile要素を飛ばす。
+  // 自分の攻撃・敵の攻撃どちらからも呼ばれる共通処理(ヘルパー)。
+  launchProjectile(side, typeLabel, duration) {
+    const kind = this.constructor.ATTACK_KIND_BY_TYPE[typeLabel] || "fire"
+    const color = this.constructor.TYPE_EFFECT[typeLabel] || "#cccccc"
+
+    const fromPlatform = side === "player" ? this.playerPlatformTarget : this.enemyPlatformTarget
+    const toPlatform = side === "player" ? this.enemyPlatformTarget : this.playerPlatformTarget
+
+    // Godot版の「発射側の少し内側から発射し、着弾側の足元近くに当たる」という
+    // 狙いを踏襲した固定オフセット。攻撃する側が変わっても同じ比率を使う。
     const start = {
-      left: this.enemyPlatformTarget.offsetLeft + this.enemyPlatformTarget.offsetWidth * 0.5,
-      top: this.enemyPlatformTarget.offsetTop + this.enemyPlatformTarget.offsetHeight * 0.2,
+      left: fromPlatform.offsetLeft + fromPlatform.offsetWidth * 0.5,
+      top: fromPlatform.offsetTop + fromPlatform.offsetHeight * 0.2,
     }
     const end = {
-      left: this.playerPlatformTarget.offsetLeft + this.playerPlatformTarget.offsetWidth * 0.6,
-      top: this.playerPlatformTarget.offsetTop + this.playerPlatformTarget.offsetHeight * 0.95,
+      left: toPlatform.offsetLeft + toPlatform.offsetWidth * 0.6,
+      top: toPlatform.offsetTop + toPlatform.offsetHeight * 0.95,
     }
+    const angleDeg = Math.atan2(end.top - start.top, end.left - start.left) * 180 / Math.PI
 
-    this.projectileTarget.style.left = `${start.left}px`
-    this.projectileTarget.style.top = `${start.top}px`
-    this.projectileTarget.animate(
+    const el = this.projectileTarget
+    el.className = `battle-projectile battle-projectile--${kind}`
+    el.style.setProperty("--projectile-color", color)
+    el.style.setProperty("--projectile-angle", `${angleDeg}deg`)
+    el.style.left = `${start.left}px`
+    el.style.top = `${start.top}px`
+    el.hidden = false
+
+    this.playAttackSound(side, kind)
+
+    el.animate(
       [
         { left: `${start.left}px`, top: `${start.top}px` },
         { left: `${end.left}px`, top: `${end.top}px` },
       ],
-      { duration: this.constructor.FIREBALL_TRAVEL_MS, easing: "linear", fill: "forwards" }
+      { duration, easing: "linear", fill: "forwards" }
     )
-
-    this.impactAt = Date.now() + this.constructor.FIREBALL_TRAVEL_MS
-    this.enemyTurnTimer = setTimeout(() => this.resolveEnemyAttack(), this.constructor.FIREBALL_TRAVEL_MS)
   }
 
   jump() {
@@ -299,6 +332,66 @@ export default class extends Controller {
       ],
       { duration: 180 }
     )
+  }
+
+  // 攻撃音は音声ファイルを追加せず、Web Audio APIのオシレーターでその場で
+  // 合成する(著作権上、外部音源を使わない方針。ガチャのBGM合成と同じ考え方)。
+  // 自分側=高め+square波、敵側=低め+sawtooth波で基本の作り分けをした上で、
+  // 攻撃の種類(炎/氷/衝撃波/光線)ごとに周波数の変化パターンを変える。
+  ensureAudioContext() {
+    if (!this.audioContext) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext
+      this.audioContext = new AudioContextClass()
+    }
+    if (this.audioContext.state === "suspended") this.audioContext.resume().catch(() => {})
+    return this.audioContext
+  }
+
+  playAttackSound(side, kind) {
+    try {
+      const ctx = this.ensureAudioContext()
+      const now = ctx.currentTime
+      const baseFreq = side === "player" ? 520 : 260
+
+      const oscillator = ctx.createOscillator()
+      const gain = ctx.createGain()
+      oscillator.connect(gain)
+      gain.connect(ctx.destination)
+
+      oscillator.type = side === "player" ? "square" : "sawtooth"
+      let duration = 0.2
+
+      switch (kind) {
+        case "fire":
+          oscillator.frequency.setValueAtTime(baseFreq * 0.9, now)
+          oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, now + 0.15)
+          duration = 0.18
+          break
+        case "ice":
+          oscillator.type = "sine"
+          oscillator.frequency.setValueAtTime(baseFreq * 1.8, now)
+          duration = 0.3
+          break
+        case "shockwave":
+          oscillator.frequency.setValueAtTime(baseFreq * 0.5, now)
+          duration = 0.2
+          break
+        case "beam":
+          oscillator.frequency.setValueAtTime(baseFreq, now)
+          oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 2.2, now + 0.2)
+          duration = 0.22
+          break
+      }
+
+      gain.gain.setValueAtTime(0.2, now)
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration)
+
+      oscillator.start(now)
+      oscillator.stop(now + duration)
+    } catch (error) {
+      // 自動再生制限等で失敗しても演出自体は止めない
+      console.error("attack sound failed", error)
+    }
   }
 
   endBattle(playerWon) {
