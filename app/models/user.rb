@@ -16,7 +16,6 @@ class User < ApplicationRecord
   has_many :user_monsters, dependent: :destroy
   has_many :monsters, -> { distinct }, through: :user_monsters
   has_many :user_titles, dependent: :destroy
-  has_many :api_tokens, dependent: :destroy
   belongs_to :current_title, class_name: "Title", optional: true
 
   has_one_attached :avatar_image

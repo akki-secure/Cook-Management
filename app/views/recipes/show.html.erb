@@ -26,6 +26,7 @@
 <div class="recipe-engagement">
   <%= render "favorites/favorite_button", recipe: @recipe %>
   <%= render "ratings/average_rating", recipe: @recipe %>
+  <%= link_to "Xで共有", twitter_share_url(@recipe), class: "btn", target: "_blank", rel: "noopener" %>
 </div>
 
 <% if logged_in? %>

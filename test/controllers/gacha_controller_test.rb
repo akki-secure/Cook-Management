@@ -10,6 +10,17 @@ class GachaControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_url
   end
 
+  test "show requires login" do
+    get gacha_url
+    assert_redirected_to login_url
+  end
+
+  test "show renders successfully when logged in" do
+    sign_in_as(@user)
+    get gacha_url
+    assert_response :success
+  end
+
   test "shows an alert when coins are insufficient" do
     sign_in_as(@user)
     result = Gamification::GachaPullService::Result.new(hit: false, monster: nil, error: :insufficient_coins)
@@ -18,7 +29,7 @@ class GachaControllerTest < ActionDispatch::IntegrationTest
       post gacha_url
     end
 
-    assert_redirected_to profile_url
+    assert_redirected_to gacha_url
     assert_equal "コインが足りません。", flash[:alert]
   end
 
@@ -31,7 +42,7 @@ class GachaControllerTest < ActionDispatch::IntegrationTest
       post gacha_url
     end
 
-    assert_redirected_to profile_url
+    assert_redirected_to gacha_url
     assert_match "テストモンスター", flash[:notice]
   end
 
@@ -43,7 +54,7 @@ class GachaControllerTest < ActionDispatch::IntegrationTest
       post gacha_url
     end
 
-    assert_redirected_to profile_url
+    assert_redirected_to gacha_url
     assert_match "ハズレ", flash[:notice]
   end
 
@@ -60,7 +71,7 @@ class GachaControllerTest < ActionDispatch::IntegrationTest
       post gacha_seven_url
     end
 
-    assert_redirected_to profile_url
+    assert_redirected_to gacha_url
     assert_equal "レインボーコインが足りません。", flash[:alert]
   end
 
@@ -74,7 +85,7 @@ class GachaControllerTest < ActionDispatch::IntegrationTest
       post gacha_seven_url
     end
 
-    assert_redirected_to profile_url
+    assert_redirected_to gacha_url
     assert_match "テストモンスター", flash[:notice]
   end
 
