@@ -587,6 +587,24 @@ form.button_to {
   text-decoration: none;
 }
 
+.mon-tile.release-tile {
+  cursor: pointer;
+  position: relative;
+}
+
+.mon-tile.release-tile:has(.release-tile__checkbox:checked) {
+  border-color: #c0392b;
+  background: #fdeceb;
+}
+
+.release-tile__checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 18px;
+  height: 18px;
+}
+
 .mon-tile:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 18px -10px rgba(224, 122, 63, 0.18);

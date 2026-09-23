@@ -27,6 +27,9 @@ Rails.application.routes.draw do
 
   resources :monsters, only: [ :index, :show ]
 
+  get "user_monsters", to: "user_monsters#index", as: :user_monsters
+  delete "user_monsters", to: "user_monsters#destroy"
+
   resource :battle, only: [ :show ], controller: "battles"
   post "battle_results", to: "battle_results#create"
 
