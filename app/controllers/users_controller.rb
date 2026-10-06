@@ -19,6 +19,10 @@ class UsersController < ApplicationController
   def show
     @recipes = current_user.recipes
     @owned_monster_count = current_user.monsters.count
+    @contribution_data = current_user.recipes
+      .where(created_at: 1.year.ago.beginning_of_day..Time.current)
+      .group("DATE(created_at)")
+      .count
   end
 
   def edit

@@ -1240,3 +1240,94 @@ span.nav-btn {
   margin-bottom: 8px;
   font-size: 1.5em;
 }
+
+/* ── Contribution Graph ─────────────────────────────────────── */
+
+.contribution-graph-section {
+  margin-bottom: 32px;
+}
+
+.cg-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.cg-day-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 22px;
+  flex-shrink: 0;
+}
+
+.cg-day-labels span {
+  height: 12px;
+  line-height: 12px;
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-align: right;
+  width: 14px;
+}
+
+.cg-right {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cg-month-labels {
+  position: relative;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.cg-month-labels span {
+  position: absolute;
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+  line-height: 18px;
+}
+
+.cg-grid {
+  display: grid;
+  grid-template-rows: repeat(7, 12px);
+  grid-auto-columns: 12px;
+  grid-auto-flow: column;
+  gap: 2px;
+}
+
+.cg-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  cursor: default;
+}
+
+.cg-cell--empty   { background: transparent; }
+.cg-cell--level-0 { background: #ebedf0; }
+.cg-cell--level-1 { background: #f9cba3; }
+.cg-cell--level-2 { background: #f4a96a; }
+.cg-cell--level-3 { background: #e07a3f; }
+.cg-cell--level-4 { background: #b85e2a; }
+
+.cg-cell:not(.cg-cell--empty):hover {
+  outline: 1px solid rgba(0, 0, 0, 0.25);
+  outline-offset: 1px;
+}
+
+.cg-tooltip {
+  position: fixed;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1000;
+  white-space: nowrap;
+}

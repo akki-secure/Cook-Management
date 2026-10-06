@@ -30,6 +30,13 @@
   <% end %>
 </div>
 
+<div class="contribution-graph-section"
+     data-controller="contribution-graph"
+     data-contribution-graph-data-value="<%= @contribution_data.to_json %>">
+  <h2>投稿記録</h2>
+  <div data-contribution-graph-target="container"></div>
+</div>
+
 <h2>投稿したレシピ</h2>
 
 <% if @recipes.any? %>
