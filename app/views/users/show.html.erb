@@ -30,6 +30,29 @@
   <% end %>
 </div>
 
+<div class="house-section">
+  <% house = current_user.house_info %>
+  <% next_house = current_user.next_house_info %>
+  <div class="house-image-wrap">
+    <%= image_tag "houses/#{house[:key]}.png", alt: house[:name], class: "house-img" %>
+  </div>
+  <div class="house-info">
+    <p class="house-name"><%= house[:name] %></p>
+    <p class="house-streak">連続投稿 <strong><%= current_user.current_streak_days %></strong> 日</p>
+    <% if next_house %>
+      <p class="house-next">次の建物まで あと <strong><%= next_house[:min] - current_user.current_streak_days %></strong> 日</p>
+    <% else %>
+      <p class="house-next house-next--max">最高ランク達成！</p>
+    <% end %>
+    <div class="house-freeze">
+      <% 3.times do |i| %>
+        <span class="freeze-icon <%= i < current_user.streak_freeze_count ? '' : 'freeze-icon--empty' %>">❄️</span>
+      <% end %>
+      <span class="freeze-label">ストリークフリーズ</span>
+    </div>
+  </div>
+</div>
+
 <div class="contribution-graph-section"
      data-controller="contribution-graph"
      data-contribution-graph-data-value="<%= @contribution_data.to_json %>">

@@ -1423,3 +1423,81 @@ span.nav-btn {
   }
   .grass-frame--b { opacity: 0; }
 }
+
+/* ---- House Section ---- */
+.house-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: #fff8f0;
+  border: 1px solid #f0d9b5;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.house-image-wrap {
+  flex-shrink: 0;
+}
+
+.house-img {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+}
+
+.house-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.house-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.house-streak {
+  margin: 0;
+  color: #555;
+}
+
+.house-next {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.house-next--max {
+  color: #e07a3f;
+  font-weight: bold;
+}
+
+.house-freeze {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.freeze-icon {
+  font-size: 1.1rem;
+}
+
+.freeze-icon--empty {
+  opacity: 0.2;
+}
+
+.freeze-label {
+  font-size: 0.8rem;
+  color: #888;
+  margin-left: 0.25rem;
+}
+
+@media (max-width: 480px) {
+  .house-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
