@@ -48,7 +48,27 @@
   <div data-battle-target="battlePanel" hidden>
     <p data-battle-target="turnLabel">あなたのターン</p>
 
+    <% tod = case Time.current.hour
+               when 6..17 then ""
+               when 18..20 then "evening_"
+               else "night_"
+               end %>
     <div class="battle-arena">
+      <div class="battle-bg-layer">
+        <%= image_tag "clouds/cloud_#{tod}big.png",    class: "battle-cloud battle-cloud--1", alt: "" %>
+        <%= image_tag "clouds/cloud_#{tod}medium.png", class: "battle-cloud battle-cloud--2", alt: "" %>
+        <%= image_tag "clouds/cloud_#{tod}small.png",  class: "battle-cloud battle-cloud--3", alt: "" %>
+      </div>
+      <div class="battle-ground-layer">
+        <% 5.times do |i| %>
+          <div class="battle-grass-tuft battle-grass-tuft--<%= i + 1 %>">
+            <%= image_tag "nature/grass_tuft_sway1.png", class: "grass-frame grass-frame--a", alt: "" %>
+            <%= image_tag "nature/grass_tuft_sway2.png", class: "grass-frame grass-frame--b", alt: "" %>
+          </div>
+        <% end %>
+        <%= image_tag "nature/flower_tuft.png", class: "battle-flower battle-flower--1", alt: "" %>
+        <%= image_tag "nature/flower_tuft.png", class: "battle-flower battle-flower--2", alt: "" %>
+      </div>
       <div class="battle-platform battle-platform-player" data-battle-target="playerPlatform">
         <div class="battle-shadow"></div>
         <img data-battle-target="playerIcon" alt="">
