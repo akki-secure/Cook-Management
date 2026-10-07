@@ -27,6 +27,7 @@ module Gamification
         record_activity!(on: on)
       else
         user.update!(current_streak_days: 1, last_activity_on: on)
+        grant_streak_bonus!(1, on)
       end
     end
     alias_method :record_login!, :record_activity!
