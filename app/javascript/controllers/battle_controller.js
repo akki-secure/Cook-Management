@@ -8,7 +8,7 @@ export default class extends Controller {
   static targets = [
     "selectionPanel", "instructionLabel", "selfModeButton", "bossModeButton",
     "monsterGrid", "startBattleButton",
-    "battlePanel", "turnLabel", "playerPlatform", "enemyPlatform", "playerIcon", "enemyIcon", "projectile",
+    "battlePanel", "turnLabel", "playerPlatform", "enemyPlatform", "playerIcon", "enemyIcon", "projectile", "projectileImage",
     "playerNameAtk", "playerHpFill", "playerHpNum",
     "enemyNameAtk", "enemyHpFill", "enemyHpNum",
     "attackButton", "jumpButton", "guardButton", "resultLabel",
@@ -19,6 +19,7 @@ export default class extends Controller {
     boss: Object,
     reportUrl: String,
     csrf: String,
+    attackImages: Object,
   }
 
   static TYPE_EFFECT = {
@@ -31,7 +32,8 @@ export default class extends Controller {
   // 属性カラムは無いため、既存の食べ物カテゴリを流用している。
   static ATTACK_KIND_BY_TYPE = {
     "がっつり": "fire", "めん類": "fire",
-    "ドリンク": "ice", "やさい": "ice", "なつのあじ": "ice",
+    "ドリンク": "ice",
+    "やさい": "wind", "なつのあじ": "lightning",
     "スイーツ": "shockwave", "デザート": "shockwave",
     "たまご": "beam", "おつまみ": "beam",
   }
@@ -246,6 +248,15 @@ export default class extends Controller {
     el.style.setProperty("--projectile-angle", `${angleDeg}deg`)
     el.style.left = `${start.left}px`
     el.style.top = `${start.top}px`
+
+    const imageUrl = this.attackImagesValue[kind]
+    if (imageUrl) {
+      this.projectileImageTarget.src = imageUrl
+      this.projectileImageTarget.hidden = false
+    } else {
+      this.projectileImageTarget.hidden = true
+    }
+
     el.hidden = false
 
     this.playAttackSound(side, kind)
@@ -380,6 +391,18 @@ export default class extends Controller {
           oscillator.frequency.setValueAtTime(baseFreq, now)
           oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 2.2, now + 0.2)
           duration = 0.22
+          break
+        case "lightning":
+          oscillator.type = "sawtooth"
+          oscillator.frequency.setValueAtTime(baseFreq * 3.0, now)
+          oscillator.frequency.exponentialRampToValueAtTime(baseFreq * 0.3, now + 0.12)
+          duration = 0.14
+          break
+        case "wind":
+          oscillator.type = "sine"
+          oscillator.frequency.setValueAtTime(baseFreq * 1.2, now)
+          oscillator.frequency.linearRampToValueAtTime(baseFreq * 0.8, now + 0.25)
+          duration = 0.28
           break
       }
 
