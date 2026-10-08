@@ -26,4 +26,23 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true,
             format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, allow_nil: true
+
+  HOUSE_LEVELS = [
+    { min: 0,  max: 0,                key: "house_1_straw",          name: "藁の家" },
+    { min: 1,  max: 2,                key: "house_2_wood",           name: "木の家" },
+    { min: 3,  max: 6,                key: "house_2b_brick",         name: "レンガの家" },
+    { min: 7,  max: 13,               key: "house_3_castle",         name: "城" },
+    { min: 14, max: 29,               key: "house_4_palace",         name: "宮殿" },
+    { min: 30, max: 59,               key: "house_5_skycastle",      name: "空飛ぶ城" },
+    { min: 60, max: Float::INFINITY,  key: "house_6_diamond_palace", name: "ダイヤモンド宮殿" },
+  ].freeze
+
+  def house_info
+    HOUSE_LEVELS.find { |h| current_streak_days.between?(h[:min], h[:max]) } || HOUSE_LEVELS.first
+  end
+
+  def next_house_info
+    idx = HOUSE_LEVELS.index(house_info)
+    HOUSE_LEVELS[idx + 1]
+  end
 end

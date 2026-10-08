@@ -4,8 +4,10 @@ one:
   name: 山田太郎
   email: yamada@example.com
   password_digest: <%= password_digest %>
+  streak_freeze_count: 1
 
 two:
   name: 鈴木花子
   email: suzuki@example.com
   password_digest: <%= password_digest %>
+  streak_freeze_count: 1
