@@ -134,6 +134,16 @@ h2 { font-size: 1.3rem; }
   margin-bottom: 16px;
 }
 
+.app-rainbow-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, #ff0080, #ff8c00, #ffe000, #00d2ff, #7b2ff7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .auth-form {
   max-width: 360px;
 }
@@ -953,50 +963,33 @@ span.nav-btn {
   --projectile-color: #cccccc;
 }
 
-.battle-projectile--fire {
-  width: 20px;
-  height: 20px;
-  border-radius: 50% 50% 50% 0;
-  background: radial-gradient(circle at 35% 35%, #fff3c4, var(--projectile-color) 70%);
-  box-shadow: 0 0 10px var(--projectile-color);
-  animation: battle-flicker 0.15s infinite alternate;
-}
-
-.battle-projectile--ice {
-  width: 14px;
-  height: 26px;
-  background: linear-gradient(to bottom, #eafcff, var(--projectile-color));
-  clip-path: polygon(50% 0%, 100% 30%, 70% 100%, 30% 100%, 0% 30%);
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
-}
-
-.battle-projectile--shockwave {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 4px solid var(--projectile-color);
-  background: transparent;
-  animation: battle-shock-expand 0.4s infinite;
-}
-
-.battle-projectile--beam {
-  width: 40px;
-  height: 6px;
-  border-radius: 3px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--projectile-color), #ffffff);
-  box-shadow: 0 0 8px var(--projectile-color);
-  transform: rotate(var(--projectile-angle, 0deg));
+.battle-projectile-img {
+  display: block;
+  pointer-events: none;
   transform-origin: center;
 }
 
-@keyframes battle-flicker {
-  from { transform: scale(1); opacity: 1; }
-  to { transform: scale(0.85); opacity: 0.85; }
+.battle-projectile--fire .battle-projectile-img,
+.battle-projectile--shockwave .battle-projectile-img,
+.battle-projectile--wind .battle-projectile-img {
+  height: 48px;
+  width: auto;
 }
 
-@keyframes battle-shock-expand {
-  from { transform: scale(0.9); opacity: 1; }
-  to { transform: scale(1.5); opacity: 0.3; }
+.battle-projectile--ice .battle-projectile-img {
+  height: 40px;
+  width: auto;
+}
+
+.battle-projectile--lightning .battle-projectile-img {
+  height: 52px;
+  width: auto;
+}
+
+.battle-projectile--beam .battle-projectile-img {
+  height: 28px;
+  width: 80px;
+  transform: rotate(var(--projectile-angle, 0deg));
 }
 
 .battle-hud-row {

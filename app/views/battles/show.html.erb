@@ -11,12 +11,23 @@
     type_label: "がっつり"
   }
 %>
+<%
+  attack_images = {
+    "fire"      => image_path("attacks/atk_fire_wave.png"),
+    "ice"       => image_path("attacks/atk_water_wave.png"),
+    "shockwave" => image_path("attacks/atk_slash.png"),
+    "beam"      => image_path("attacks/atk_beam.png"),
+    "lightning" => image_path("attacks/atk_lightning.png"),
+    "wind"      => image_path("attacks/atk_wind.png"),
+  }
+%>
 <div class="battle-app"
      data-controller="battle"
      data-battle-monsters-value="<%= monsters_with_url.to_json %>"
      data-battle-boss-value="<%= boss_data.to_json %>"
      data-battle-report-url-value="<%= battle_results_path %>"
-     data-battle-csrf-value="<%= form_authenticity_token %>">
+     data-battle-csrf-value="<%= form_authenticity_token %>"
+     data-battle-attack-images-value="<%= attack_images.to_json %>">
 
   <div data-battle-target="selectionPanel">
     <div class="battle-mode-row">
@@ -77,7 +88,9 @@
         <div class="battle-shadow"></div>
         <img data-battle-target="enemyIcon" alt="">
       </div>
-      <div class="battle-projectile" data-battle-target="projectile" hidden></div>
+      <div class="battle-projectile" data-battle-target="projectile" hidden>
+        <img data-battle-target="projectileImage" class="battle-projectile-img" alt="">
+      </div>
     </div>
 
     <div class="battle-hud-row">
