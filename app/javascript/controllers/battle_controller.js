@@ -11,7 +11,7 @@ export default class extends Controller {
     "battlePanel", "turnLabel", "playerPlatform", "enemyPlatform", "playerIcon", "enemyIcon", "projectile", "projectileImage",
     "playerNameAtk", "playerHpFill", "playerHpNum",
     "enemyNameAtk", "enemyHpFill", "enemyHpNum",
-    "attackButton", "jumpButton", "guardButton", "resultLabel",
+    "attackButton", "attackChoicePanel", "jumpButton", "guardButton", "resultLabel",
   ]
 
   static values = {
@@ -42,7 +42,7 @@ export default class extends Controller {
   static BOSS_ATTACK_MULTIPLIER = 1.25
   static FIREBALL_TRAVEL_MS = 1000
   static DODGE_WINDOW_MS = 250
-  static MIN_HOP_HALF_MS = 140
+  static MIN_HOP_HALF_MS = 400
   static TURN_PAUSE_MS = 500
 
   connect() {
@@ -147,6 +147,7 @@ export default class extends Controller {
 
     this.playerIconTarget.src = this.playerStats.spriteUrl
     this.enemyIconTarget.src = this.enemyStats.spriteUrl
+    this.element.classList.toggle("battle-is-boss", this.isBossBattle)
 
     this.gameOver = false
     this.resultLabelTarget.textContent = ""
@@ -175,15 +176,26 @@ export default class extends Controller {
     this.turn = "player"
     this.turnLabelTarget.textContent = "あなたのターン"
     this.attackButtonTarget.disabled = false
+    this.attackButtonTarget.hidden = false
+    this.attackChoicePanelTarget.hidden = true
     this.jumpButtonTarget.disabled = true
     this.guardButtonTarget.disabled = true
   }
 
   attack() {
     if (this.turn !== "player" || this.gameOver) return
+    this.attackButtonTarget.hidden = true
+    this.attackChoicePanelTarget.hidden = false
+  }
+
+  chooseAttack(event) {
+    if (this.turn !== "player" || this.gameOver) return
+    const kind = event.currentTarget.dataset.kind
+    this.attackChoicePanelTarget.hidden = true
+    this.attackButtonTarget.hidden = false
     this.attackButtonTarget.disabled = true
 
-    this.launchProjectile("player", this.playerStats.typeLabel, this.constructor.FIREBALL_TRAVEL_MS)
+    this.launchProjectile("player", this.playerStats.typeLabel, this.constructor.FIREBALL_TRAVEL_MS, kind)
     setTimeout(() => this.resolvePlayerAttack(), this.constructor.FIREBALL_TRAVEL_MS)
   }
 
@@ -216,31 +228,46 @@ export default class extends Controller {
 
     this.launchProjectile("enemy", this.enemyStats.typeLabel, this.constructor.FIREBALL_TRAVEL_MS)
 
-    this.impactAt = Date.now() + this.constructor.FIREBALL_TRAVEL_MS
-    this.enemyTurnTimer = setTimeout(() => this.resolveEnemyAttack(), this.constructor.FIREBALL_TRAVEL_MS)
+    // 投射物はアリーナ端(-60px)まで飛ぶので、プレイヤーに実際に到達する時刻を
+    // 位置の比率から計算する。これにより impactAt とジャンプ回避判定がずれない。
+    const enemyLeft    = this.enemyPlatformTarget.offsetLeft
+    const playerRight  = this.playerPlatformTarget.offsetLeft + this.playerPlatformTarget.offsetWidth
+    const totalPx      = enemyLeft + 60  // start → -60px まで
+    const distToPlayer = enemyLeft - playerRight
+    const actualImpactMs = totalPx > 0
+      ? Math.round((distToPlayer / totalPx) * this.constructor.FIREBALL_TRAVEL_MS)
+      : this.constructor.FIREBALL_TRAVEL_MS
+
+    this.impactAt         = Date.now() + actualImpactMs
+    this.attackAnimEndsAt = Date.now() + this.constructor.FIREBALL_TRAVEL_MS
+    this.enemyTurnTimer   = setTimeout(() => this.resolveEnemyAttack(), actualImpactMs)
   }
 
   // 攻撃側(player/enemy)のtype_labelから見た目(炎/氷/衝撃波/光線)と音を決めて、
   // 攻撃側プラットフォーム→防御側プラットフォームへ.battle-projectile要素を飛ばす。
   // 自分の攻撃・敵の攻撃どちらからも呼ばれる共通処理(ヘルパー)。
-  launchProjectile(side, typeLabel, duration) {
-    const kind = this.constructor.ATTACK_KIND_BY_TYPE[typeLabel] || "fire"
+  launchProjectile(side, typeLabel, duration, kindOverride = null) {
+    const kind = kindOverride || this.constructor.ATTACK_KIND_BY_TYPE[typeLabel] || "fire"
     const color = this.constructor.TYPE_EFFECT[typeLabel] || "#cccccc"
 
     const fromPlatform = side === "player" ? this.playerPlatformTarget : this.enemyPlatformTarget
-    const toPlatform = side === "player" ? this.enemyPlatformTarget : this.playerPlatformTarget
 
-    // Godot版の「発射側の少し内側から発射し、着弾側の足元近くに当たる」という
-    // 狙いを踏襲した固定オフセット。攻撃する側が変わっても同じ比率を使う。
+    // アリーナの高さの55%付近を水平に飛ばす(地面より高く、ジャンプで確実に回避できる高さ)。
+    const arena = fromPlatform.closest(".battle-arena")
+    const fixedY = arena ? arena.clientHeight * 0.85 : fromPlatform.offsetTop + fromPlatform.offsetHeight * 0.4
+
+    const arenaWidth = arena ? arena.clientWidth : 600
     const start = {
-      left: fromPlatform.offsetLeft + fromPlatform.offsetWidth * 0.5,
-      top: fromPlatform.offsetTop + fromPlatform.offsetHeight * 0.2,
+      left: side === "player"
+        ? fromPlatform.offsetLeft + fromPlatform.offsetWidth
+        : fromPlatform.offsetLeft,
+      top: fixedY,
     }
     const end = {
-      left: toPlatform.offsetLeft + toPlatform.offsetWidth * 0.6,
-      top: toPlatform.offsetTop + toPlatform.offsetHeight * 0.95,
+      left: side === "player" ? arenaWidth + 60 : -60,
+      top: fixedY,
     }
-    const angleDeg = Math.atan2(end.top - start.top, end.left - start.left) * 180 / Math.PI
+    const angleDeg = 0
 
     const el = this.projectileTarget
     el.className = `battle-projectile battle-projectile--${kind}`
@@ -277,8 +304,12 @@ export default class extends Controller {
 
     const half = Math.max(this.impactAt - this.jumpPressedAt, this.constructor.MIN_HOP_HALF_MS)
     this.playerIconTarget.animate(
-      [{ transform: "translateY(0)" }, { transform: "translateY(-24px)" }, { transform: "translateY(0)" }],
-      { duration: half * 2, easing: "ease-out" }
+      [
+        { transform: "translateY(0)",     easing: "cubic-bezier(0.33, 1, 0.68, 1)" },
+        { transform: "translateY(-130px)", easing: "cubic-bezier(0.32, 0, 0.67, 0)" },
+        { transform: "translateY(0)" },
+      ],
+      { duration: half * 2 }
     )
   }
 
@@ -304,7 +335,8 @@ export default class extends Controller {
       if (this.jumpPressedAt === null) this.shake(this.playerIconTarget)
     }
 
-    setTimeout(() => { this.projectileTarget.hidden = true }, 150)
+    const remainingMs = Math.max(150, (this.attackAnimEndsAt || 0) - Date.now())
+    setTimeout(() => { this.projectileTarget.hidden = true }, remainingMs)
 
     this.playerStats.hp = Math.max(0, this.playerStats.hp - dmg)
     this.updateHud()
@@ -420,6 +452,8 @@ export default class extends Controller {
   endBattle(playerWon) {
     this.gameOver = true
     this.attackButtonTarget.disabled = true
+    this.attackButtonTarget.hidden = false
+    this.attackChoicePanelTarget.hidden = true
     this.jumpButtonTarget.disabled = true
     this.guardButtonTarget.disabled = true
     if (this.enemyTurnTimer) clearTimeout(this.enemyTurnTimer)
@@ -460,6 +494,8 @@ export default class extends Controller {
 
   backToList() {
     if (this.enemyTurnTimer) clearTimeout(this.enemyTurnTimer)
+    this.attackChoicePanelTarget.hidden = true
+    this.attackButtonTarget.hidden = false
     this.selectedPlayerIndex = -1
     this.selectedEnemyIndex = -1
     this.refreshGridHighlights()

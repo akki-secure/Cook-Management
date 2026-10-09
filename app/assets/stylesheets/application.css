@@ -910,11 +910,52 @@ span.nav-btn {
 
 .battle-arena {
   position: relative;
-  height: 220px;
-  background: linear-gradient(to bottom, #8cbfeb 0%, #8cbfeb 60%, #6ba354 60%, #6ba354 100%);
+  height: 280px;
   border-radius: 10px;
   overflow: hidden;
   margin: 12px 0;
+}
+
+/* 朝 (5〜8時): 暖かい朝焼け→青空→緑の地面 */
+.battle-arena--morning {
+  background: linear-gradient(to bottom,
+    #f9a84d 0%,
+    #ffd0a0 25%,
+    #87ceeb 50%,
+    #6ba8d4 62%,
+    #5a9e42 62%,
+    #4a8a34 100%
+  );
+}
+
+/* 昼 (9〜17時): 青空→緑の地面 (元の背景) */
+.battle-arena--day {
+  background: linear-gradient(to bottom, #8cbfeb 0%, #8cbfeb 62%, #6ba354 62%, #6ba354 100%);
+}
+
+/* 夕暮れ (18〜20時): 紫→橙→暗い地面 */
+.battle-arena--evening {
+  background: linear-gradient(to bottom,
+    #1e0a3c 0%,
+    #4a1060 20%,
+    #8b2252 42%,
+    #d4472a 58%,
+    #e87a30 63%,
+    #1e1030 63%,
+    #0e0820 100%
+  );
+}
+
+/* 夜 (21〜4時): 深い紺→黒い地面 */
+.battle-arena--night {
+  background: linear-gradient(to bottom,
+    #04040f 0%,
+    #0a0a2e 30%,
+    #12103a 55%,
+    #0e0c28 62%,
+    #060410 62%,
+    #020208 100%
+  );
 }
 
 .battle-platform {
@@ -942,13 +983,23 @@ span.nav-btn {
 }
 
 .battle-platform-player {
-  left: 24px;
-  bottom: 20px;
+  left: 20px;
+  bottom: 14px;
+  width: 70px;
+  height: 80px;
 }
 
 .battle-platform-enemy {
-  right: 24px;
-  top: 20px;
+  right: 30px;
+  bottom: 14px;
+  width: 70px;
+  height: 80px;
+}
+
+/* ボス戦のみ敵を大きく表示 */
+.battle-is-boss .battle-platform-enemy {
+  width: 115px;
+  height: 125px;
 }
 
 /* 位置(top/left)はCSSのkeyframesではなく battle_controller.js が攻撃側/防御側の
@@ -992,28 +1043,84 @@ span.nav-btn {
   transform: rotate(var(--projectile-angle, 0deg));
 }
 
-.battle-hud-row {
+.battle-hud-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
   display: flex;
-  gap: 16px;
-  margin-bottom: 12px;
+  justify-content: space-between;
+  gap: 10px;
+  z-index: 20;
+  pointer-events: none;
 }
 
-.battle-hud {
+.battle-hud-overlay .battle-hud {
   flex: 1;
+  min-width: 0;
+}
+
+.battle-hud-overlay .battle-hud p {
+  margin: 0 0 3px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.battle-hp-bar-wrap {
+  position: relative;
 }
 
 .battle-hp-bar {
-  background: #ddd;
+  position: relative;
+  background: rgba(0,0,0,0.45);
   border-radius: 6px;
-  height: 12px;
+  height: 18px;
   overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.25);
 }
 
 .battle-hp-bar-fill {
-  background: #59bf59;
+  background: linear-gradient(to right, #2d9e2d, #59bf59);
   height: 100%;
   width: 100%;
-  transition: width 0.2s ease-out;
+  transition: width 0.3s ease-out;
+}
+
+.battle-hp-num-inside {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 1px 2px rgba(0,0,0,0.8);
+  z-index: 1;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.battle-attack-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.battle-attack-choices {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.battle-choice-btn {
+  font-size: 13px;
+  padding: 4px 10px;
 }
 
 .battle-controls-row {
