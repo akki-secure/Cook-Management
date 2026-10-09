@@ -134,6 +134,16 @@ h2 { font-size: 1.3rem; }
   margin-bottom: 16px;
 }
 
+.app-rainbow-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, #ff0080, #ff8c00, #ffe000, #00d2ff, #7b2ff7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .auth-form {
   max-width: 360px;
 }
