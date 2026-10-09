@@ -63,8 +63,14 @@
                when 6..17 then ""
                when 18..20 then "evening_"
                else "night_"
-               end %>
-    <div class="battle-arena">
+               end
+       tod_bg = case Time.current.hour
+                when 5..8   then "morning"
+                when 9..17  then "day"
+                when 18..20 then "evening"
+                else             "night"
+                end %>
+    <div class="battle-arena battle-arena--<%= tod_bg %>">
       <div class="battle-bg-layer">
         <%= image_tag "clouds/cloud_#{tod}big.png",    class: "battle-cloud battle-cloud--1", alt: "" %>
         <%= image_tag "clouds/cloud_#{tod}medium.png", class: "battle-cloud battle-cloud--2", alt: "" %>
@@ -80,6 +86,22 @@
         <%= image_tag "nature/flower_tuft.png", class: "battle-flower battle-flower--1", alt: "" %>
         <%= image_tag "nature/flower_tuft.png", class: "battle-flower battle-flower--2", alt: "" %>
       </div>
+      <div class="battle-hud-overlay">
+        <div class="battle-hud">
+          <p data-battle-target="playerNameAtk"></p>
+          <div class="battle-hp-bar-wrap">
+            <div class="battle-hp-bar"><div class="battle-hp-bar-fill" data-battle-target="playerHpFill"></div></div>
+            <span class="battle-hp-num-inside" data-battle-target="playerHpNum"></span>
+          </div>
+        </div>
+        <div class="battle-hud">
+          <p data-battle-target="enemyNameAtk"></p>
+          <div class="battle-hp-bar-wrap">
+            <div class="battle-hp-bar"><div class="battle-hp-bar-fill" data-battle-target="enemyHpFill"></div></div>
+            <span class="battle-hp-num-inside" data-battle-target="enemyHpNum"></span>
+          </div>
+        </div>
+      </div>
       <div class="battle-platform battle-platform-player" data-battle-target="playerPlatform">
         <div class="battle-shadow"></div>
         <img data-battle-target="playerIcon" alt="">
@@ -93,21 +115,15 @@
       </div>
     </div>
 
-    <div class="battle-hud-row">
-      <div class="battle-hud">
-        <p data-battle-target="playerNameAtk"></p>
-        <div class="battle-hp-bar"><div class="battle-hp-bar-fill" data-battle-target="playerHpFill"></div></div>
-        <p data-battle-target="playerHpNum"></p>
-      </div>
-      <div class="battle-hud">
-        <p data-battle-target="enemyNameAtk"></p>
-        <div class="battle-hp-bar"><div class="battle-hp-bar-fill" data-battle-target="enemyHpFill"></div></div>
-        <p data-battle-target="enemyHpNum"></p>
-      </div>
-    </div>
-
     <div class="battle-controls-row">
-      <button type="button" class="btn" data-battle-target="attackButton" data-action="battle#attack">こうげき</button>
+      <div class="battle-attack-group">
+        <button type="button" class="btn" data-battle-target="attackButton" data-action="battle#attack">こうげき</button>
+        <div data-battle-target="attackChoicePanel" hidden class="battle-attack-choices">
+          <button type="button" class="btn battle-choice-btn" data-kind="fire"  data-action="battle#chooseAttack">🔥 炎</button>
+          <button type="button" class="btn battle-choice-btn" data-kind="ice"   data-action="battle#chooseAttack">❄️ 氷</button>
+          <button type="button" class="btn battle-choice-btn" data-kind="beam"  data-action="battle#chooseAttack">✨ 光線</button>
+        </div>
+      </div>
       <button type="button" class="btn" data-battle-target="jumpButton" data-action="battle#jump" disabled>ジャンプ</button>
       <button type="button" class="btn" data-battle-target="guardButton" data-action="battle#guard" disabled>ガード</button>
     </div>
