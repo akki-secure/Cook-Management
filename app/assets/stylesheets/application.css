@@ -785,6 +785,30 @@ span.nav-btn {
   color: var(--muted);
 }
 
+.mon-stats {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.mon-stats th,
+.mon-stats td {
+  padding: 5px 8px;
+  border-bottom: 1px dashed #e8d3ae;
+  text-align: left;
+}
+
+.mon-stats th {
+  color: var(--muted);
+  white-space: nowrap;
+  width: 1%;
+}
+
+.mon-stats td {
+  color: var(--text);
+}
+
 .back-link {
   display: block;
   text-align: center;
@@ -1127,6 +1151,19 @@ span.nav-btn {
   display: flex;
   gap: 8px;
   margin-bottom: 12px;
+}
+
+.battle-weakness-flash {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22px;
+  font-weight: bold;
+  color: #ff3333;
+  text-shadow: 0 0 8px #fff, 0 2px 4px rgba(0,0,0,0.4);
+  pointer-events: none;
+  z-index: 20;
 }
 
 /* ガチャ結果の演出(Godot版のカプセルが開いてモンスターが飛び出す表現を、

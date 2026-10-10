@@ -9,12 +9,17 @@ class BattlesController < ApplicationController
         sprite_key: monster.sprite_key,
         hp: monster.hp,
         attack: monster.attack,
+        defense: monster.defense,
+        attacks: monster.attacks_array,
+        weakness: monster.weakness,
         type_label: monster.type_label
       }
     end
 
-    @boss_stage_sprite_keys = %w[
-      boss_hamburg_dark.png boss_hamburg_fire.png boss_hamburg_ice.png boss_hamburg_poison.png
+    @boss_stages = [
+      { sprite: "boss_hamburg_fire.png",   kind: "fire" },
+      { sprite: "boss_hamburg_ice.png",    kind: "ice" },
+      { sprite: "boss_hamburg_dark.png",   kind: "shockwave" }
     ]
   end
 end

@@ -5,9 +5,12 @@
   boss_data = {
     name: "クラウンハンバーグ",
     sprite_url: image_path("monsters/boss_crowned_hamburg.png"),
-    stage_sprite_urls: @boss_stage_sprite_keys.map { |key| image_path("monsters/#{key}") },
+    boss_stages: @boss_stages.map { |s| { sprite: image_path("monsters/#{s[:sprite]}"), kind: s[:kind] } },
     hp: 150,
     attack: 18,
+    defense: 15,
+    attacks: ["charge", "fire", "shockwave"],
+    weakness: "ice",
     type_label: "がっつり"
   }
 %>
@@ -119,9 +122,7 @@
       <div class="battle-attack-group">
         <button type="button" class="btn" data-battle-target="attackButton" data-action="battle#attack">こうげき</button>
         <div data-battle-target="attackChoicePanel" hidden class="battle-attack-choices">
-          <button type="button" class="btn battle-choice-btn" data-kind="fire"  data-action="battle#chooseAttack">🔥 炎</button>
-          <button type="button" class="btn battle-choice-btn" data-kind="ice"   data-action="battle#chooseAttack">❄️ 氷</button>
-          <button type="button" class="btn battle-choice-btn" data-kind="beam"  data-action="battle#chooseAttack">✨ 光線</button>
+          <!-- battle_controller の startBattle() でプレイヤーモンスターの attacks に基づいて動的に生成 -->
         </div>
       </div>
       <button type="button" class="btn" data-battle-target="jumpButton" data-action="battle#jump" disabled>ジャンプ</button>
