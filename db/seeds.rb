@@ -40,7 +40,18 @@ Monster.where("sprite_key LIKE 'color:%'").destroy_all
   { name: "ヒエヒエソーメン", sprite_key: "somen.png",               description: "冷たいつゆで涼をとるそうめんのモンスター。",           hp: 86,  attack: 16, defense: 7,  weakness: "shockwave", attacks: '["charge","shockwave","ice"]' },
   { name: "メロンゼリオ",     sprite_key: "green_jelly.png",         description: "つやつや揺れるメロン味のゼリーのモンスター。",         hp: 85,  attack: 17, defense: 9,  weakness: "fire",      attacks: '["charge","beam","wind"]' },
   { name: "ソーダゼリオ",     sprite_key: "blue_jelly.png",          description: "しゅわしゅわ弾けるソーダ味のゼリーのモンスター。",     hp: 83,  attack: 16, defense: 8,  weakness: "lightning", attacks: '["charge","ice","beam"]' },
-  { name: "ショートケーキング", sprite_key: "sponge_cake.png",       description: "いちごをのせた王様級のショートケーキのモンスター。",   hp: 100, attack: 19, defense: 12, weakness: "fire",      attacks: '["charge","fire","beam"]' }
+  { name: "ショートケーキング", sprite_key: "sponge_cake.png",       description: "いちごをのせた王様級のショートケーキのモンスター。",   hp: 100, attack: 19, defense: 12, weakness: "fire",      attacks: '["charge","fire","beam"]' },
+  { name: "カレードン",       sprite_key: "monster_curry.png",        description: "こくのあるカレーソースに半分埋まったモンスター。",       hp: 105, attack: 24, defense: 13, weakness: "ice",       attacks: '["charge","fire","shockwave"]' },
+  { name: "ギュウどん",       sprite_key: "monster_gyudon.png",       description: "甘辛いタレをまとった牛丼のモンスター。",               hp: 108, attack: 20, defense: 14, weakness: "wind",      attacks: '["charge","fire","lightning"]' },
+  { name: "ハンバーグセッター", sprite_key: "monster_hamburg_set.png", description: "ジューシーなハンバーグと飲み物がセットになったモンスター。", hp: 112, attack: 22, defense: 15, weakness: "ice",       attacks: '["charge","fire","beam"]' },
+  { name: "ホタテーン",       sprite_key: "monster_hotate.png",       description: "旨みたっぷりのホタテから生まれたモンスター。",           hp: 90,  attack: 17, defense: 10, weakness: "lightning", attacks: '["charge","ice","beam"]' },
+  { name: "イカゾーン",       sprite_key: "monster_ikayaki.png",      description: "串に刺さったままワープするイカ焼きのモンスター。",       hp: 88,  attack: 19, defense: 9,  weakness: "fire",      attacks: '["charge","shockwave","wind"]' },
+  { name: "オムラコン",       sprite_key: "monster_omurice.png",      description: "ふわふわ卵がとろけるオムライスのモンスター。",           hp: 95,  attack: 21, defense: 12, weakness: "shockwave", attacks: '["charge","fire","beam"]' },
+  { name: "ピッザーン",       sprite_key: "monster_pizza_whole.png",  description: "まんまるホールピザから生まれたモンスター。チーズが最強の武器。", hp: 118, attack: 23, defense: 16, weakness: "ice",       attacks: '["charge","fire","wind"]' },
+  { name: "ラーメンキング",   sprite_key: "monster_ramen.png",        description: "真っ赤な激辛スープが全身から吹き出す最強のラーメンモンスター。", hp: 120, attack: 50, defense: 14, weakness: "ice",       attacks: '["charge","fire","beam"]' },
+  { name: "スシサーモン",     sprite_key: "monster_sushi.png",        description: "新鮮なサーモンをのせた寿司のモンスター。",               hp: 92,  attack: 17, defense: 11, weakness: "fire",      attacks: '["charge","ice","lightning"]' },
+  { name: "タコヤッキー",     sprite_key: "monster_takoyaki.png",     description: "熱々の鉄板の上に並ぶたこ焼きのモンスター。",             hp: 96,  attack: 19, defense: 11, weakness: "wind",      attacks: '["charge","fire","shockwave"]' },
+  { name: "ヤキザカナー",     sprite_key: "monster_yakizakana.png",   description: "じっくり焼かれた香ばしい焼き魚のモンスター。",           hp: 87,  attack: 16, defense: 9,  weakness: "shockwave", attacks: '["charge","shockwave","wind"]' }
 ].each do |attrs|
   monster = Monster.find_or_initialize_by(name: attrs[:name])
   monster.sprite_key = attrs[:sprite_key]

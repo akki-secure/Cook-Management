@@ -1396,8 +1396,13 @@ span.nav-btn {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-top: 22px;
+  margin-top: 40px;
   flex-shrink: 0;
+}
+
+.cg-year-spacer {
+  height: 18px;
+  display: block;
 }
 
 .cg-day-labels span {
@@ -1413,6 +1418,41 @@ span.nav-btn {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.cg-year-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  margin-bottom: 2px;
+}
+
+.cg-year-label {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--text);
+  min-width: 56px;
+  text-align: center;
+}
+
+.cg-year-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.75rem;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.cg-year-btn:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.cg-year-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .cg-month-labels {
@@ -1445,11 +1485,12 @@ span.nav-btn {
 }
 
 .cg-cell--empty   { background: transparent; }
+.cg-cell--future  { background: #ebedf0; opacity: 0.4; }
 .cg-cell--level-0 { background: #ebedf0; }
-.cg-cell--level-1 { background: #f9cba3; }
-.cg-cell--level-2 { background: #f4a96a; }
-.cg-cell--level-3 { background: #e07a3f; }
-.cg-cell--level-4 { background: #b85e2a; }
+.cg-cell--level-1 { background: #9be9a8; }
+.cg-cell--level-2 { background: #40c463; }
+.cg-cell--level-3 { background: #30a14e; }
+.cg-cell--level-4 { background: #216e39; }
 
 .cg-cell:not(.cg-cell--empty):hover {
   outline: 1px solid rgba(0, 0, 0, 0.25);
