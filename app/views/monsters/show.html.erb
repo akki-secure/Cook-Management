@@ -25,6 +25,15 @@
         まだ出会っていないモンスターだ。ガチャで探してみよう。
       <% end %>
     </p>
+    <% if @owned %>
+      <table class="mon-stats">
+        <tr><th>❤️ HP</th><td><%= @monster.hp %></td></tr>
+        <tr><th>⚔️ 攻撃力</th><td><%= @monster.attack %></td></tr>
+        <tr><th>🛡️ 防御力</th><td><%= @monster.defense %></td></tr>
+        <tr><th>⚠️ 弱点</th><td><%= @monster.weakness_label %></td></tr>
+        <tr><th>💥 固有技</th><td><%= @monster.attacks_label %></td></tr>
+      </table>
+    <% end %>
   </div>
 
   <% if @next_monster %>
