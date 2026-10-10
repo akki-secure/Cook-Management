@@ -19,10 +19,13 @@ class UsersController < ApplicationController
   def show
     @recipes = current_user.recipes
     @owned_monster_count = current_user.monsters.count
-    @contribution_data = current_user.recipes
-      .where(created_at: 1.year.ago.beginning_of_day..Time.current)
-      .group("DATE(created_at)")
-      .count
+    @contribution_data = contribution_data_for(Time.current.year)
+  end
+
+  def contribution
+    year = params[:year].to_i
+    year = Time.current.year if year < 2000 || year > Time.current.year
+    render json: { data: contribution_data_for(year) }
   end
 
   def edit
@@ -40,6 +43,15 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def contribution_data_for(year)
+    start_time = Time.new(year, 1, 1).beginning_of_day
+    end_time   = Time.new(year, 12, 31).end_of_day
+    current_user.recipes
+                .where(created_at: start_time..end_time)
+                .group('DATE(created_at)')
+                .count
+  end
 
   def user_params
     params.require(:user).permit(:name, :email, :password, :password_confirmation, :avatar_image)

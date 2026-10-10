@@ -55,7 +55,8 @@
 
 <div class="contribution-graph-section"
      data-controller="contribution-graph"
-     data-contribution-graph-data-value="<%= @contribution_data.to_json %>">
+     data-contribution-graph-data-value="<%= @contribution_data.to_json %>"
+     data-contribution-graph-url-value="<%= contribution_profile_path %>">
   <h2>投稿記録</h2>
   <div data-contribution-graph-target="container"></div>
 </div>

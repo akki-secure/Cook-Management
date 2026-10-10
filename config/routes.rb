@@ -11,7 +11,9 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
-  resource :profile, only: [ :show, :edit, :update ], controller: "users"
+  resource :profile, only: [ :show, :edit, :update ], controller: "users" do
+    get :contribution, on: :member
+  end
 
   resources :password_resets, param: :token, only: [ :new, :create, :edit, :update ]
 

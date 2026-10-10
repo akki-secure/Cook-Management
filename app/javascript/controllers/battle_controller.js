@@ -75,6 +75,7 @@ export default class extends Controller {
     this.bossAttackKind = "fire"
     this.turn = "player"
     this.gameOver = false
+    this.isAnimating = false
     this.jumpPressedAt = null
     this.guarded = false
     this.impactAt = 0
@@ -232,6 +233,7 @@ export default class extends Controller {
   // --- ターン進行 ---
 
   startPlayerTurn() {
+    this.isAnimating = false
     this.turn = "player"
     this.turnLabelTarget.textContent = "あなたのターン"
     this.attackButtonTarget.disabled = false
@@ -242,13 +244,14 @@ export default class extends Controller {
   }
 
   attack() {
-    if (this.turn !== "player" || this.gameOver) return
+    if (this.turn !== "player" || this.gameOver || this.isAnimating) return
     this.attackButtonTarget.hidden = true
     this.attackChoicePanelTarget.hidden = false
   }
 
   chooseAttack(event) {
-    if (this.turn !== "player" || this.gameOver) return
+    if (this.turn !== "player" || this.gameOver || this.isAnimating) return
+    this.isAnimating = true
     const kind = event.currentTarget.dataset.kind
     this.attackChoicePanelTarget.hidden = true
     this.attackButtonTarget.hidden = false
@@ -466,7 +469,8 @@ export default class extends Controller {
       return
     }
 
-    setTimeout(() => this.startPlayerTurn(), this.constructor.TURN_PAUSE_MS)
+    // アニメーションが完全に終わってからプレイヤーターンを開始する
+    setTimeout(() => this.startPlayerTurn(), remainingMs + this.constructor.TURN_PAUSE_MS)
   }
 
   maybeTransformBoss() {
