@@ -37,6 +37,7 @@ export default class extends Controller {
 
   _buildGraph(data) {
     const { columns, monthLabels } = this._computeGrid(data, this._currentYear)
+    const total = Object.values(data).reduce((sum, v) => sum + v, 0)
 
     const wrapper = document.createElement("div")
     wrapper.className = "cg-wrapper"
@@ -115,7 +116,42 @@ export default class extends Controller {
       })
     })
 
+    // 凡例 + 年間合計行
+    const metaRow = document.createElement("div")
+    metaRow.className = "cg-meta"
+
+    const legend = document.createElement("div")
+    legend.className = "cg-legend"
+    const legendItems = [
+      { cls: "cg-cell--level-0", label: "活動なし" },
+      { cls: "cg-cell--level-1", label: "1件" },
+      { cls: "cg-cell--level-2", label: "2件" },
+      { cls: "cg-cell--level-3", label: "3件以上" },
+    ]
+    const keyLabel = document.createElement("span")
+    keyLabel.className = "cg-legend-key"
+    keyLabel.textContent = "凡例"
+    legend.appendChild(keyLabel)
+    legendItems.forEach(({ cls, label }) => {
+      const item = document.createElement("span")
+      item.className = "cg-legend-item"
+      const cell = document.createElement("span")
+      cell.className = `cg-legend-cell ${cls}`
+      item.appendChild(cell)
+      item.appendChild(document.createTextNode(label))
+      legend.appendChild(item)
+    })
+
+    const totalEl = document.createElement("div")
+    totalEl.className = "cg-total"
+    const yearWord = this._currentYear === this._maxYear ? "今年" : `${this._currentYear}年`
+    totalEl.innerHTML = `${yearWord}の投稿総数 <strong>${total}</strong>件`
+
+    metaRow.appendChild(legend)
+    metaRow.appendChild(totalEl)
+
     right.appendChild(yearNav)
+    right.appendChild(metaRow)
     right.appendChild(monthRow)
     right.appendChild(grid)
     wrapper.appendChild(dayLabels)
