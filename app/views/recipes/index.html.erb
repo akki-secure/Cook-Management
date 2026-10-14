@@ -41,7 +41,7 @@
           <% end %>
           <div class="recipe-card-body">
             <h3><%= recipe.title %></h3>
-            <div class="meta"><%= recipe.category.name %> / <%= recipe.user.name %></div>
+            <div class="meta"><%= recipe.category&.name || "未分類" %> / <%= recipe.user.name %></div>
             <%= render "ratings/average_rating", recipe: recipe %>
             <ul class="tag-list">
               <% recipe.tags.each do |tag| %>
