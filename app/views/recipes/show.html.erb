@@ -11,7 +11,7 @@
   <h1><%= @recipe.title %></h1>
 
   <div class="recipe-meta-list">
-    <span>カテゴリ: <%= @recipe.category&.name || "未分類" %></span>
+    <span>カテゴリ: <%= @recipe.category.name %></span>
     <% if @recipe.cooking_time.present? %>
       <span>調理時間: <%= @recipe.cooking_time %>分</span>
     <% end %>
