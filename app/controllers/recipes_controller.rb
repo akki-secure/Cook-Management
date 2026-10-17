@@ -4,7 +4,7 @@ class RecipesController < ApplicationController
   before_action :require_owner, only: %i[edit update destroy]
 
   def index
-    @recipes = Recipe.includes(:category, :tags, :user, :ratings, :favorites, :ingredients)
+    @recipes = Recipe.with_attached_image.includes(:category, :tags, :user, :ratings, :favorites, :ingredients)
                      .search_by_keyword(params[:q])
                      .in_category(params[:category_id])
                      .tagged_with(params[:tag_id])
