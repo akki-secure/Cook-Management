@@ -6,5 +6,7 @@ class BattleResultsController < ApplicationController
       user: current_user, mode: params[:mode], result: params[:result]
     )
     render json: { rainbow_coins_awarded: reward.rainbow_coins_awarded, rainbow_coins: current_user.rainbow_coins }
+  rescue StandardError
+    render json: { error: 'エラーが発生しました' }, status: :internal_server_error
   end
 end
