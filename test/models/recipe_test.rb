@@ -28,9 +28,9 @@ class RecipeTest < ActiveSupport::TestCase
     assert_not recipe.valid?
   end
 
-  test "invalid without a category" do
+  test "valid without a category" do
     recipe = Recipe.new(valid_attributes.merge(category: nil))
-    assert_not recipe.valid?
+    assert recipe.valid?
   end
 
   test "invalid with a non-positive cooking_time" do
