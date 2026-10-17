@@ -1,7 +1,13 @@
 class ApplicationController < ActionController::Base
   helper_method :current_user, :logged_in?
 
+  rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+
   private
+
+  def record_not_found
+    redirect_to root_path, alert: 'お探しのページが見つかりませんでした。'
+  end
 
   def current_user
     return @current_user if defined?(@current_user)
