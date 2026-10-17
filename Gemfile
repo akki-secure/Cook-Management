@@ -3,10 +3,7 @@ source 'https://rubygems.org'
 ruby '3.3.11'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem 'rails', '~> 7.2.3'
-
-# json 3.1.0 は Rails 7.2 の generate_token_for と非互換のためピン留め
-gem 'json', '~> 2.7'
+gem 'rails', '~> 7.2.4'
 
 gem 'dotenv-rails', groups: %i[development test]
 
