@@ -14,6 +14,14 @@ module Gamification
     def call
       return Result.new(hit: false, monster: nil, error: :insufficient_coins) if user.coins < GachaRules::COST
 
+      execute_pull
+    end
+
+    private
+
+    attr_reader :user
+
+    def execute_pull
       monster = nil
       hit = false
       limit_reached = false
@@ -28,19 +36,7 @@ module Gamification
           raise ActiveRecord::Rollback
         end
 
-        user.update!(coins: user.coins - GachaRules::COST)
-        gacha_pull = GachaPull.create!(user: user, cost: GachaRules::COST, hit: false)
-        CoinEvent.create!(
-          user: user, source_type: CoinEvent::GACHA_PULL, source_id: gacha_pull.id,
-          amount: -GachaRules::COST, occurred_on: Date.current
-        )
-
-        hit = rolled_hit?
-        if hit
-          monster = pick_monster
-          UserMonster.create!(user: user, monster: monster, acquired_on: Date.current) if monster
-        end
-        gacha_pull.update!(hit: hit, monster: monster)
+        hit, monster = deduct_and_roll
       end
 
       return Result.new(hit: false, monster: nil, error: :monster_limit_reached) if limit_reached
@@ -48,9 +44,20 @@ module Gamification
       Result.new(hit: hit, monster: monster, error: nil)
     end
 
-    private
+    def deduct_and_roll
+      user.update!(coins: user.coins - GachaRules::COST)
+      gacha_pull = GachaPull.create!(user: user, cost: GachaRules::COST, hit: false)
+      CoinEvent.create!(
+        user: user, source_type: CoinEvent::GACHA_PULL, source_id: gacha_pull.id,
+        amount: -GachaRules::COST, occurred_on: Date.current
+      )
 
-    attr_reader :user
+      hit = rolled_hit?
+      monster = hit ? pick_monster : nil
+      UserMonster.create!(user: user, monster: monster, acquired_on: Date.current) if monster
+      gacha_pull.update!(hit: hit, monster: monster)
+      [hit, monster]
+    end
 
     # テストでスタブしやすいよう当落判定だけを独立したメソッドに切り出す
     def rolled_hit?
@@ -59,7 +66,7 @@ module Gamification
 
     # レベルによる出現制限は設けず、登録されている全モンスターから均等にランダム抽選する
     def pick_monster
-      Monster.order(Arel.sql("RAND()")).first
+      Monster.order(Arel.sql('RAND()')).first
     end
   end
 end

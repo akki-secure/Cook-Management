@@ -1,7 +1,7 @@
-ENV["RAILS_ENV"] ||= "test"
-require_relative "../config/environment"
-require "rails/test_help"
-require "minitest/mock"
+ENV['RAILS_ENV'] ||= 'test'
+require_relative '../config/environment'
+require 'rails/test_help'
+require 'minitest/mock'
 
 module ActiveSupport
   class TestCase
@@ -16,9 +16,9 @@ module ActiveSupport
 end
 
 module SignInHelper
-  def sign_in_as(user, password: "password123")
+  def sign_in_as(user, password: 'password123')
     post login_url, params: { email: user.email, password: password }
   end
 end
 
-ActionDispatch::IntegrationTest.include SignInHelper
+ActiveSupport.on_load(:action_dispatch_integration_test) { include SignInHelper }

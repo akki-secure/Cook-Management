@@ -1,8 +1,18 @@
 class UsersController < ApplicationController
-  before_action :require_login, only: [:show, :edit, :update]
+  before_action :require_login, only: %i[show edit update]
+
+  def show
+    @recipes = current_user.recipes
+    @owned_monster_count = current_user.monsters.count
+    @contribution_data = contribution_data_for(Time.current.year)
+  end
 
   def new
     @user = User.new
+  end
+
+  def edit
+    @user = current_user
   end
 
   def create
@@ -10,16 +20,10 @@ class UsersController < ApplicationController
 
     if @user.save
       session[:user_id] = @user.id
-      redirect_to recipes_path, notice: "アカウントを作成しました。"
+      redirect_to recipes_path, notice: 'アカウントを作成しました。'
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
-  end
-
-  def show
-    @recipes = current_user.recipes
-    @owned_monster_count = current_user.monsters.count
-    @contribution_data = contribution_data_for(Time.current.year)
   end
 
   def contribution
@@ -28,25 +32,21 @@ class UsersController < ApplicationController
     render json: { data: contribution_data_for(year) }
   end
 
-  def edit
-    @user = current_user
-  end
-
   def update
     @user = current_user
 
     if @user.update(update_params)
-      redirect_to profile_path, notice: "プロフィールを更新しました。"
+      redirect_to profile_path, notice: 'プロフィールを更新しました。'
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
   private
 
   def contribution_data_for(year)
-    start_time = Time.new(year, 1, 1).beginning_of_day
-    end_time   = Time.new(year, 12, 31).end_of_day
+    start_time = Time.zone.local(year, 1, 1).beginning_of_day
+    end_time   = Time.zone.local(year, 12, 31).end_of_day
     current_user.recipes
                 .where(created_at: start_time..end_time)
                 .group('DATE(created_at)')

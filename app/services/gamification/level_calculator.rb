@@ -8,7 +8,7 @@ module Gamification
       def exp_to_next_level(level)
         return nil if level >= MAX_LEVEL
 
-        100 + 15 * ((level - 1)**2)
+        100 + (15 * ((level - 1)**2))
       end
 
       # そのレベルに到達するために必要な累積EXP

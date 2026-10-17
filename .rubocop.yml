@@ -1,0 +1,59 @@
+plugins:
+  - rubocop-rails
+  - rubocop-minitest
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.3
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+    - 'bin/**/*'
+    - 'config/environments/**/*'
+    - 'config/initializers/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
+
+# 日本語コメントを許可
+Style/AsciiComments:
+  Enabled: false
+
+# frozen_string_literal コメントは省略可
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# クラス・モジュールのドキュメントコメントは不要
+Style/Documentation:
+  Enabled: false
+
+# ロケールファイルへの移動は今後の課題
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+# メソッドの長さは緩めに設定
+Metrics/MethodLength:
+  Max: 30
+
+# クラスの長さも緩めに設定
+Metrics/ClassLength:
+  Max: 200
+
+# ABCの複雑度は緩めに設定
+Metrics/AbcSize:
+  Max: 30
+
+# ブロックの長さを緩めに設定
+Metrics/BlockLength:
+  Exclude:
+    - 'test/**/*'
+    - 'config/routes.rb'
+
+# 行の長さ制限を緩めに
+Layout/LineLength:
+  Max: 160
+  Exclude:
+    - 'test/**/*'
+
+# テストファイルの複数アサーションを許可
+Minitest/MultipleAssertions:
+  Enabled: false

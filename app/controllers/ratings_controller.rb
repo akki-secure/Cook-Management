@@ -9,9 +9,9 @@ class RatingsController < ApplicationController
     respond_to do |format|
       if @rating.save
         format.turbo_stream
-        format.html { redirect_to @recipe, notice: "評価を登録しました。" }
+        format.html { redirect_to @recipe, notice: '評価を登録しました。' }
       else
-        format.html { redirect_to @recipe, alert: "評価に失敗しました。" }
+        format.html { redirect_to @recipe, alert: '評価に失敗しました。' }
       end
     end
   end

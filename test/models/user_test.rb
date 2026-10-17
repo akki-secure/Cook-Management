@@ -1,68 +1,77 @@
-require "test_helper"
+require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
   def valid_attributes
-    { name: "テスト太郎", email: "test-user@example.com", password: "password123", password_confirmation: "password123" }
+    { name: 'テスト太郎', email: 'test-user@example.com', password: 'password123', password_confirmation: 'password123' }
   end
 
-  test "valid with name, email, and password" do
+  test 'valid with name, email, and password' do
     user = User.new(valid_attributes)
-    assert user.valid?
+
+    assert_predicate user, :valid?
   end
 
-  test "invalid without a name" do
-    user = User.new(valid_attributes.merge(name: ""))
+  test 'invalid without a name' do
+    user = User.new(valid_attributes.merge(name: ''))
+
     assert_not user.valid?
     assert_includes user.errors[:name], "can't be blank"
   end
 
-  test "invalid without an email" do
-    user = User.new(valid_attributes.merge(email: ""))
+  test 'invalid without an email' do
+    user = User.new(valid_attributes.merge(email: ''))
+
     assert_not user.valid?
     assert_includes user.errors[:email], "can't be blank"
   end
 
-  test "invalid with a malformed email" do
-    user = User.new(valid_attributes.merge(email: "not-an-email"))
+  test 'invalid with a malformed email' do
+    user = User.new(valid_attributes.merge(email: 'not-an-email'))
+
     assert_not user.valid?
-    assert_includes user.errors[:email], "is invalid"
+    assert_includes user.errors[:email], 'is invalid'
   end
 
-  test "invalid with a duplicate email" do
+  test 'invalid with a duplicate email' do
     user = User.new(valid_attributes.merge(email: users(:one).email))
+
     assert_not user.valid?
-    assert_includes user.errors[:email], "has already been taken"
+    assert_includes user.errors[:email], 'has already been taken'
   end
 
-  test "email is normalized to a stripped, downcased value" do
-    user = User.new(valid_attributes.merge(email: "  Test-User@Example.com  "))
+  test 'email is normalized to a stripped, downcased value' do
+    user = User.new(valid_attributes.merge(email: '  Test-User@Example.com  '))
     user.valid?
-    assert_equal "test-user@example.com", user.email
+
+    assert_equal 'test-user@example.com', user.email
   end
 
-  test "invalid with a short password" do
-    user = User.new(valid_attributes.merge(password: "short", password_confirmation: "short"))
+  test 'invalid with a short password' do
+    user = User.new(valid_attributes.merge(password: 'short', password_confirmation: 'short'))
+
     assert_not user.valid?
-    assert_includes user.errors[:password], "is too short (minimum is 8 characters)"
+    assert_includes user.errors[:password], 'is too short (minimum is 8 characters)'
   end
 
-  test "destroying a user destroys their recipes" do
+  test 'destroying a user destroys their recipes' do
     user = users(:one)
-    assert_difference "Recipe.count", -user.recipes.count do
+    assert_difference 'Recipe.count', -user.recipes.count do
       user.destroy
     end
   end
 
-  test "has no avatar image attached by default" do
+  test 'has no avatar image attached by default' do
     user = User.new(valid_attributes)
+
     assert_not user.avatar_image.attached?
   end
 
-  test "can have an avatar image attached" do
+  test 'can have an avatar image attached' do
     user = User.create!(valid_attributes)
-    File.open(Rails.root.join("test/fixtures/files/test_image.png")) do |file|
-      user.avatar_image.attach(io: file, filename: "test_image.png", content_type: "image/png")
+    Rails.root.join('test/fixtures/files/test_image.png').open do |file|
+      user.avatar_image.attach(io: file, filename: 'test_image.png', content_type: 'image/png')
     end
-    assert user.avatar_image.attached?
+
+    assert_predicate user.avatar_image, :attached?
   end
 end

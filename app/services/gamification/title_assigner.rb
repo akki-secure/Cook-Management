@@ -6,7 +6,7 @@ module Gamification
     end
 
     def call
-      new_title = Title.where("min_level <= ?", user.level).order(min_level: :desc).first
+      new_title = Title.where(min_level: ..user.level).order(min_level: :desc).first
       return if new_title.nil? || user.current_title_id == new_title.id
 
       user.update!(current_title_id: new_title.id)
