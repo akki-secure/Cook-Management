@@ -29,7 +29,7 @@ module Gamification
     attr_reader :user, :mode, :result
 
     def boss_win?
-      mode == "boss" && result == "win"
+      mode == 'boss' && result == 'win'
     end
   end
 end

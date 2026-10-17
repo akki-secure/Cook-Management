@@ -1,126 +1,134 @@
-require "test_helper"
+require 'test_helper'
 
 class UsersControllerTest < ActionDispatch::IntegrationTest
   def valid_params
-    { user: { name: "新規ユーザー", email: "newuser@example.com", password: "password123", password_confirmation: "password123" } }
+    { user: { name: '新規ユーザー', email: 'newuser@example.com', password: 'password123', password_confirmation: 'password123' } }
   end
 
-  test "new is accessible" do
+  test 'new is accessible' do
     get signup_url
+
     assert_response :success
   end
 
-  test "create signs up a valid user and logs them in" do
-    assert_difference "User.count", 1 do
+  test 'create signs up a valid user and logs them in' do
+    assert_difference 'User.count', 1 do
       post signup_url, params: valid_params
     end
 
     user = User.order(:created_at).last
+
     assert_redirected_to recipes_url
     assert_equal user.id, session[:user_id]
   end
 
-  test "create rejects a duplicate email" do
-    assert_no_difference "User.count" do
+  test 'create rejects a duplicate email' do
+    assert_no_difference 'User.count' do
       post signup_url, params: { user: valid_params[:user].merge(email: users(:one).email) }
     end
     assert_response :unprocessable_entity
   end
 
-  test "create rejects a mismatched password confirmation" do
-    assert_no_difference "User.count" do
-      post signup_url, params: { user: valid_params[:user].merge(password_confirmation: "different123") }
+  test 'create rejects a mismatched password confirmation' do
+    assert_no_difference 'User.count' do
+      post signup_url, params: { user: valid_params[:user].merge(password_confirmation: 'different123') }
     end
     assert_response :unprocessable_entity
   end
 
-  test "create accepts an uploaded avatar image" do
-    image = fixture_file_upload("test_image.png", "image/png")
+  test 'create accepts an uploaded avatar image' do
+    image = fixture_file_upload('test_image.png', 'image/png')
 
-    assert_difference "User.count", 1 do
+    assert_difference 'User.count', 1 do
       post signup_url, params: { user: valid_params[:user].merge(avatar_image: image) }
     end
 
     user = User.order(:created_at).last
-    assert user.avatar_image.attached?
+
+    assert_predicate user.avatar_image, :attached?
   end
 
-  test "show requires login" do
+  test 'show requires login' do
     get profile_url
+
     assert_redirected_to login_url
   end
 
   test "show displays the current user's recipes" do
     sign_in_as(users(:one))
     get profile_url
+
     assert_response :success
   end
 
-  test "show displays acquired monster count without error" do
-    monster = Monster.create!(name: "テストモンスター", sprite_key: "egg_character.png")
+  test 'show displays acquired monster count without error' do
+    monster = Monster.create!(name: 'テストモンスター', sprite_key: 'egg_character.png')
     UserMonster.create!(user: users(:one), monster: monster, acquired_on: Date.current)
 
     sign_in_as(users(:one))
     get profile_url
 
     assert_response :success
-    assert_match "集めたモンスターを見る(1 / 1体)", response.body
+    assert_match '集めたモンスターを見る(1 / 1体)', response.body
   end
 
-  test "show counts a monster acquired multiple times via gacha only once" do
-    monster = Monster.create!(name: "テストモンスター", sprite_key: "egg_character.png")
+  test 'show counts a monster acquired multiple times via gacha only once' do
+    monster = Monster.create!(name: 'テストモンスター', sprite_key: 'egg_character.png')
     3.times { UserMonster.create!(user: users(:one), monster: monster, acquired_on: Date.current) }
 
     sign_in_as(users(:one))
     get profile_url
 
     assert_response :success
-    assert_match "集めたモンスターを見る(1 / 1体)", response.body
+    assert_match '集めたモンスターを見る(1 / 1体)', response.body
   end
 
-  test "edit requires login" do
+  test 'edit requires login' do
     get edit_profile_url
+
     assert_redirected_to login_url
   end
 
-  test "update changes name and email without touching password" do
+  test 'update changes name and email without touching password' do
     sign_in_as(users(:one))
     original_digest = users(:one).password_digest
 
-    patch profile_url, params: { user: { name: "新しい名前", email: "changed@example.com", password: "", password_confirmation: "" } }
+    patch profile_url, params: { user: { name: '新しい名前', email: 'changed@example.com', password: '', password_confirmation: '' } }
 
     assert_redirected_to profile_url
     users(:one).reload
-    assert_equal "新しい名前", users(:one).name
-    assert_equal "changed@example.com", users(:one).email
+
+    assert_equal '新しい名前', users(:one).name
+    assert_equal 'changed@example.com', users(:one).email
     assert_equal original_digest, users(:one).password_digest
   end
 
-  test "update changes password when provided" do
+  test 'update changes password when provided' do
     sign_in_as(users(:one))
 
-    patch profile_url, params: { user: { name: users(:one).name, email: users(:one).email, password: "newpassword123", password_confirmation: "newpassword123" } }
+    patch profile_url, params: { user: { name: users(:one).name, email: users(:one).email, password: 'newpassword123', password_confirmation: 'newpassword123' } }
 
     assert_redirected_to profile_url
     users(:one).reload
-    assert users(:one).authenticate("newpassword123")
+
+    assert users(:one).authenticate('newpassword123')
   end
 
-  test "update rejects invalid email" do
+  test 'update rejects invalid email' do
     sign_in_as(users(:one))
 
-    patch profile_url, params: { user: { name: users(:one).name, email: "not-an-email", password: "", password_confirmation: "" } }
+    patch profile_url, params: { user: { name: users(:one).name, email: 'not-an-email', password: '', password_confirmation: '' } }
 
     assert_response :unprocessable_entity
   end
 
-  test "update changes the avatar image" do
+  test 'update changes the avatar image' do
     sign_in_as(users(:one))
-    image = fixture_file_upload("test_image.png", "image/png")
+    image = fixture_file_upload('test_image.png', 'image/png')
 
-    patch profile_url, params: { user: { name: users(:one).name, email: users(:one).email, avatar_image: image, password: "", password_confirmation: "" } }
+    patch profile_url, params: { user: { name: users(:one).name, email: users(:one).email, avatar_image: image, password: '', password_confirmation: '' } }
 
     assert_redirected_to profile_url
-    assert users(:one).reload.avatar_image.attached?
+    assert_predicate users(:one).reload.avatar_image, :attached?
   end
 end

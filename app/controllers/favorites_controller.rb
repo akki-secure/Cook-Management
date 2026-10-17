@@ -7,7 +7,7 @@ class FavoritesController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_back fallback_location: @recipe }
+      format.html { redirect_back_or_to(@recipe) }
     end
   end
 
@@ -16,7 +16,7 @@ class FavoritesController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream
-      format.html { redirect_back fallback_location: @recipe }
+      format.html { redirect_back_or_to(@recipe) }
     end
   end
 

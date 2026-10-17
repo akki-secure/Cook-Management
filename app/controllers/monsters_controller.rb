@@ -9,7 +9,7 @@ class MonstersController < ApplicationController
   def show
     @monsters = Monster.order(:id).to_a
     index_in_list = @monsters.find_index { |monster| monster.id == params[:id].to_i }
-    return redirect_to monsters_path, alert: "そのモンスターは見つかりませんでした。" if index_in_list.nil?
+    return redirect_to monsters_path, alert: 'そのモンスターは見つかりませんでした。' if index_in_list.nil?
 
     @monster = @monsters[index_in_list]
     @display_number = index_in_list + 1
@@ -21,6 +21,6 @@ class MonstersController < ApplicationController
 
   def neighboring_monsters(index_in_list)
     prev_monster = @monsters[index_in_list - 1] if index_in_list.positive?
-    [ prev_monster, @monsters[index_in_list + 1] ]
+    [prev_monster, @monsters[index_in_list + 1]]
   end
 end

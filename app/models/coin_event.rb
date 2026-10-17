@@ -1,7 +1,7 @@
 class CoinEvent < ApplicationRecord
-  RECIPE_POST = "recipe_post"
-  GACHA_PULL = "gacha_pull"
-  SOURCE_TYPES = [ RECIPE_POST, GACHA_PULL ].freeze
+  RECIPE_POST = 'recipe_post'.freeze
+  GACHA_PULL = 'gacha_pull'.freeze
+  SOURCE_TYPES = [RECIPE_POST, GACHA_PULL].freeze
 
   belongs_to :user
 

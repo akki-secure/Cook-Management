@@ -1,7 +1,7 @@
 class ExpEvent < ApplicationRecord
-  RECIPE_POST = "recipe_post"
-  LOGIN_STREAK = "login_streak"
-  SOURCE_TYPES = [ RECIPE_POST, LOGIN_STREAK ].freeze
+  RECIPE_POST = 'recipe_post'.freeze
+  LOGIN_STREAK = 'login_streak'.freeze
+  SOURCE_TYPES = [RECIPE_POST, LOGIN_STREAK].freeze
 
   belongs_to :user
 

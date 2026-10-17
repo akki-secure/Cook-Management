@@ -51,14 +51,12 @@ module Gamification
       hit = rand < GachaRules::WIN_RATE
       return { hit: false, monster: nil } unless hit
 
-      monster = Monster.order(Arel.sql("RAND()")).first
+      monster = Monster.order(Arel.sql('RAND()')).first
       return { hit: false, monster: nil } unless monster
 
       # 7連の途中で上限に達した場合は、以降の当たりはレコードを追加せず
       # ハズレとして扱う(所持数の肥大化を防ぎつつ、表示と実データを一致させる)。
-      if @owned_count >= GachaRules::MAX_OWNED_MONSTERS
-        return { hit: false, monster: nil }
-      end
+      return { hit: false, monster: nil } if @owned_count >= GachaRules::MAX_OWNED_MONSTERS
 
       UserMonster.create!(user: user, monster: monster, acquired_on: Date.current)
       @owned_count += 1

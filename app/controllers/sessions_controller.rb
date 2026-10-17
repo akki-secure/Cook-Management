@@ -1,6 +1,5 @@
 class SessionsController < ApplicationController
-  def new
-  end
+  def new; end
 
   def create
     user = User.find_by(email: params[:email]&.strip&.downcase)
@@ -8,15 +7,15 @@ class SessionsController < ApplicationController
     if user&.authenticate(params[:password])
       session[:user_id] = user.id
       Gamification::StreakService.new(user).record_login!
-      redirect_to recipes_path, notice: "ログインしました。"
+      redirect_to recipes_path, notice: 'ログインしました。'
     else
-      flash.now[:alert] = "メールアドレスまたはパスワードが違います。"
-      render :new, status: :unprocessable_entity
+      flash.now[:alert] = 'メールアドレスまたはパスワードが違います。'
+      render :new, status: :unprocessable_content
     end
   end
 
   def destroy
     session[:user_id] = nil
-    redirect_to login_path, notice: "ログアウトしました。"
+    redirect_to login_path, notice: 'ログアウトしました。'
   end
 end

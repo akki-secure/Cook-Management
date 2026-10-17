@@ -17,9 +17,9 @@ class BattlesController < ApplicationController
     end
 
     @boss_stages = [
-      { sprite: "boss_hamburg_fire.png",   kind: "fire" },
-      { sprite: "boss_hamburg_ice.png",    kind: "ice" },
-      { sprite: "boss_hamburg_dark.png",   kind: "shockwave" }
+      { sprite: 'boss_hamburg_fire.png',   kind: 'fire' },
+      { sprite: 'boss_hamburg_ice.png',    kind: 'ice' },
+      { sprite: 'boss_hamburg_dark.png',   kind: 'shockwave' }
     ]
   end
 end
